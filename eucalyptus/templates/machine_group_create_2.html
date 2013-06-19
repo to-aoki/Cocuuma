@@ -1,0 +1,217 @@
+{% extends "oss_base.html" %}
+
+{% comment %}
+# COPYRIGHT FUJITSU SOCIAL SCIENCE LABORATORY LIMITED 2012
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without modification,
+# are permitted provided that the following conditions are met:
+#
+# + Redistributions of source code must retain the above copyright notice, this list of conditions
+# and the following disclaimer.
+# + Redistributions in binary form must reproduce the above copyright notice, this list of conditions
+# and the following disclaimer in the documentation and/or other materials provided with the distribution.
+# + Neither the name of the FUJITSU SOCIAL SCIENCE LABORATORY LIMITED nor the names of its contributors
+# may be used to endorse or promote products derived from this software without specific prior written
+# permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+# IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+# FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+# CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+{% endcomment %}
+
+{% block title %}Cocuuma{% endblock title %}
+
+{% block link %}
+<link href="/static/css/machine_group_create_2.css" rel="stylesheet" type="text/css" />
+{% endblock link %}
+
+{% block script %}
+<script src="/static/js/machine_group_create_2.js" type="text/javascript"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+    //仮想マシン表示切り替えイベント
+    $(".machine_icon").click(function(){
+        if($(this).hasClass("machine_selected")){
+            return;
+        }else{
+            var index = $ (this).attr("id");
+            jump('/machine/step2select/'+index+'/');
+        }
+    });
+});
+
+function switchDetail($buttonInfo){
+    //$buttonInfoはjQueryオブジェクトです。
+    var isShown;
+    isShown = $('#details').hasClass("shown");
+    if(isShown){;
+        $('#details').hide();
+        $('#details').addClass("hidden");
+        $('#details').removeClass("shown");
+        $buttonInfo.parent("div").addClass("vmachine_info_area");
+        $buttonInfo.text("詳細設定");
+    }else{
+        $('#details').show();
+        $('#details').addClass("shown");
+        $('#details').removeClass("hidden");
+        $buttonInfo.parent("div").removeClass("vmachine_info_area");
+        $buttonInfo.text("標準設定");
+    }
+}
+
+function enableCreateVolume(form){
+	// ボリューム新規作成表示切替イベント
+	var val = form.volume.value;
+
+	if(val == 'new'){
+		$('input#id_volume_size').removeAttr("disabled");
+		$('select#id_volume_zone').removeAttr("disabled");
+
+	} else {
+		$('input#id_volume_size').attr("disabled", "disabled");
+		$('select#id_volume_zone').attr("disabled", "disabled");
+	}
+}
+
+</script>
+{% endblock script %}
+
+{% block content %}
+            <!-- main contents (left, right) start -->
+            <div id="main_contents">
+
+                <!-- left contents start -->
+                <div id="left_contents">
+
+                </div><!-- left contents end -->
+
+                <!-- right contents start -->
+                <div id="right_contents">
+                    <div id="right_contents_header">
+						<h2><img src="/static/images/new_machine.png" class="icons">&nbsp;仮想サーバグループ{% if request.session.ss_mch_editData.group_id %}編集{% else %}作成{% endif %}</h2>
+                        <div>
+                            <table class="progress_tracker">
+                                <tr>
+                                    <td id="first_column" class="past_column">1. テンプレート選択</td>
+                                    <td>&gt;</td>
+                                    <td id="second_column" class="current_column">2. 仮想サーバ設定</td>
+                                    <td>&gt;</td>
+                                    <td id="third_column" class="future_column">3. 構成確認</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+
+					{% for error in errors %}
+						<div class="err_msg">{{error}}</div>
+					{% endfor %}
+
+                        <div class="vmachine_info_area">
+                            <h2>仮想サーバ選択</h2>
+							{{ form.order }}
+                            <div id="machine_icons">
+							{% for m in request.session.ss_mch_editData.machine_list %}
+							{% ifequal forloop.counter0|stringformat:"s" form.order.value|stringformat:"s" %}
+								<div class="machine_icon  machine_selected"><span class="machine_selected">{{m.name}}</span></div>
+							{% else %}
+								<div class="machine_icon" id="{{forloop.counter0}}"><span>{{m.name}}</span></div>
+							{% endifequal %}
+							{% endfor %}
+                            </div>
+                        </div>
+
+                        <!--仮想サーバ start-->
+                        <div class="machine_config_area">
+                            <div class="vmachine_info_area">
+                                <h3><img src="/static/images/new_machine_mini.png" class="icons">&nbsp;{{form.name.value}}</h3>
+								{{form.name}}
+                                <h4><img src="/static/images/elasticIP_mini.png" class="icons">&nbsp;ネットワーク設定</h4>
+								<div>サーバのIPアドレスを公開したりDNSへ登録する場合等、固定IPが必要な場合に設定してください。</div>
+								<div>指定しない場合は仮想サーバの再起動時にIPアドレスが変更されます。</div>
+                                <table class="vmachine_info" id="group_info" cellpadding="0" cellspacing="0">
+                                    <tr>
+                                        <td>IPアドレス<span class="asterisk">*</span></td>
+                                        <td class="icon">&nbsp;</td>
+                                        <td>
+											{{ form.ip }}
+											{% comment %}<button type="button" onclick="jump('/machine/getip/')" >IPアドレス取得</button>{% endcomment %}
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="vmachine_info_area">
+                                <h4><img src="/static/images/cpu_mini.png" class="icons"><img src="/static/images/memory_mini.png" class="icons">&nbsp;起動タイプ選択</h4>
+								<div>仮想サーバが使用するハードウェアリソース量を選択してください。</div>
+                                <table class="vmachine_info" cellpadding="0" cellspacing="0">
+									{% for key, value in request.session.ss_mch_vmtypelist %}
+										<tr>
+											<td class="radio_column">
+												<input type="radio" id="id_{{form.vmtype.name}}_{{forloop.counter0}}" name="{{form.vmtype.name}}" value="{{key}}" {% ifequal key form.vmtype.value %}checked="checked"{% endifequal %}/>
+											</td>
+											<td>{{value}}</td>
+										</tr>
+									{% endfor %}
+                                </table>
+                                <div><b>※EBSブートタイプのOSイメージは最大サイズの制限はありません</b></div>
+                            </div>
+                            <div class="vmachine_info_area">
+                                <h4><img src="/static/images/storage_mini.png" class="icons">&nbsp;データボリューム</h4>
+								<div>追加のデータディスクを作成／接続します。デバイス名：/dev/vdc (instance-storeタイプの場合は /dev/vdb)</div>
+                                <table class="vmachine_info" cellpadding="0" cellspacing="0">
+                                    <tr  class="volume_1">
+                                        <td >データボリューム</td>
+                                        <td class="icon">&nbsp;</td>
+                                        <td >{{ form.volume }} <div>作成サイズ：{{ form.volume_size }}&nbsp;[GB]&nbsp;&nbsp;Availability Zone：{{form.volume_zone}}</div></td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="vmachine_info_area {% if detail_form.detail.value %}shown{% endif %}" id="details" {% if not detail_form.detail.value %}style="display:none"{% endif %}>
+                                <h4>詳細設定</h4>
+                                <table class="vmachine_info" id="group_info" cellpadding="0" cellspacing="0">
+                                    <tr>
+                                        <td class="detail_first">仮想サーバ接続鍵</td>
+                                        <td class="icon"><img src="/static/images/keyPair_tin.png"></td>
+                                        <td>{% if detail_form.detail.value %}{{ form.keypair }}{% endif %}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="detail_first">ファイアウォール</td>
+                                        <td class="icon"><img src="/static/images/firewall_tin.png"></td>
+                                        <td>{% if detail_form.detail.value %}{{ form.security_group }}{% endif %}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="detail_first">Availability Zone</td>
+                                        <td class="icon">&nbsp;</td>
+                                        <td>{% if detail_form.detail.value %}{{ form.avaulability_zone }}{% endif %}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="detail_first">ユーザーデータ</td>
+                                        <td class="icon">&nbsp;</td>
+                                        <td>{% if detail_form.detail.value %}{{ form.user_data }}{% endif %}</td>
+                                    </tr>
+                                </table>
+                            </div>
+							<div {% if not detail_form.detail.value %}class="vmachine_info_area"{% endif %}>
+								<button type="button" id="details_btn" onclick="{% if detail_form.detail.value %}switchDetail($(this)){% else %}jump('/machine/step2detail/'){% endif %}">{% if detail_form.detail.value %}標準設定{% else %}詳細設定{% endif %}</button>{{ detail_form.detail }}
+							</div>
+                        </div><!--仮想サーバ end-->
+
+                        <div id="cancel_or_next">
+                            <button type="button" onclick="{% ifequal "0" form.order.value|stringformat:"s" %}jump('/machine/step1back/'){% else %}jump('/machine/step2select/{{form.order.value|add:"-1"}}/'){% endifequal %}">&lt;&nbsp;戻る</button>
+                            <button type="button" onclick="{% ifequal request.session.ss_mch_editData.machine_list|length|add:"-1"|stringformat:"s" form.order.value|stringformat:"s" %}jump('/machine/step2end/'){% else %}jump('/machine/step2select/{{form.order.value|add:"1"}}/'){% endifequal %}">次へ&nbsp;&gt;</button>
+{% comment %}
+                            <button type="button" onclick="jump('/machine/step1back/')">&lt;&nbsp;戻る</button>
+                            <button type="button" onclick="jump('/machine/step2end/')">次へ&nbsp;&gt;</button>
+{% endcomment %}
+                            <button type="button" onclick="jump('/machine/cancel/')">キャンセル</button>
+                        </div>
+                </div><!-- right contents end -->
+
+            </div><!-- main contents (left, right) end -->
+
+{% endblock content %}

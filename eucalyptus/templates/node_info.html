@@ -1,0 +1,219 @@
+{% extends "oss_base.html" %}
+
+{% comment %}
+# COPYRIGHT FUJITSU SOCIAL SCIENCE LABORATORY LIMITED 2012
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without modification,
+# are permitted provided that the following conditions are met:
+#
+# + Redistributions of source code must retain the above copyright notice, this list of conditions
+# and the following disclaimer.
+# + Redistributions in binary form must reproduce the above copyright notice, this list of conditions
+# and the following disclaimer in the documentation and/or other materials provided with the distribution.
+# + Neither the name of the FUJITSU SOCIAL SCIENCE LABORATORY LIMITED nor the names of its contributors
+# may be used to endorse or promote products derived from this software without specific prior written
+# permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+# IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+# FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+# CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+{% endcomment %}
+
+{% block title %}Cocuuma{% endblock title %}
+
+{% block link %}
+	<link rel="stylesheet" href="/static/css/resource.css" />
+	<link href="/static/css/jquery.ui.progressbar.css" rel="stylesheet" type="text/css" />
+{% endblock %}
+
+{% block script %}
+	<script type="text/javascript" src="/static/js/node_info.js"></script>
+	<script src="/static/js/jquery.ui.core.js" type="text/javascript"></script>
+	<script src="/static/js/jquery.ui.widget.js" type="text/javascript"></script>
+	<script src="/static/js/jquery.ui.progressbar.js" type="text/javascript"></script>
+	<script type="text/javascript">
+		$(document).ready(function(){
+			value = {{node_info.cpu}} / {{node_info.max_cpu}} * 100;
+			$("#node_cpu").progressbar();
+			$("#node_cpu").progressbar("option", "value", value);
+			value = {{node_info.mem}} / {{node_info.max_mem}} * 100;
+			$("#node_mem").progressbar();
+			$("#node_mem").progressbar("option", "value", value);
+		});
+    </script>
+{% endblock %}
+
+{% block content %}
+        <!-- main contents (left, right) start -->
+        <div id="main_contents">
+
+            <!-- left contents start -->
+            <div id="left_contents">
+
+            </div><!-- left contents end -->
+
+            <!-- right contents start -->
+            <div id="right_contents">
+                <div id="right_contents_header">
+                    <h2><img src="/static/images/node.png" class="icons">&nbsp;ノード情報</h2>
+                </div>
+
+				{% for error in errors %}
+				<br><br>
+				<div class="err_msg">{{error}}</div>
+				{% endfor %}
+
+				<input name="sortinshide" id="sortinshide" type="hidden" value="{{request.session.sortins}}"/>
+				<input name="sortacchide" id="sortacchide" type="hidden" value="{{request.session.sortacc}}"/>
+				<input name="sortnodhide" id="sortnodhide" type="hidden" value="{{request.session.sortnod}}"/>
+				<input name="sortroohide" id="sortroohide" type="hidden" value="{{request.session.sortroo}}"/>
+				<input name="selected_node" id="selected_node" type="hidden" value="{{selected_node}}"/>
+				<input name="extract" id="extract" type="hidden" value="none"/>
+				<input name="resource_refresh" type="hidden" value="no"/>
+				<input id="statushide" type="hidden" value="{{request.session.filter_status}}" />
+
+				<div class="button_select_area">
+					<button type="button" onclick="refresh()" >データ更新</button>
+					&nbsp;
+					<button type="button" onclick="jump('/resource/hostlist')" >クラウド・ホスト情報に戻る</button>
+				</div>
+                <h4>
+                	<img src="/static/images/node_mini.png" class="icons">
+                	&nbsp;ノード：{{ selected_node }}
+                </h4>
+
+                <div class="instance_info_area">
+				<table class="instance_info" cellspacing="0" cellpadding="0">
+				<thead>
+					<tr>
+						<th>仮想マシン数 </th>
+						<th><img class="icons" src="/static/images/cpu_tin.png"> 使用CPU(コア) / max <img class="sort" id="scpu" src="/static/images/sort_default.png"  onClick="sortCpu();"/></th>
+						<th><img class="icons" src="/static/images/memory_tin.png"> 使用メモリ(MB) / max <img class="sort" id="smem" src="/static/images/sort_default.png"  onClick="sortMem();"/></th>
+					</tr>
+				</thead>
+				<tbody>
+				   <tr>
+					   <td>{{ node_info.num_instances }}</td>
+					   <td class="graph">{{ node_info.cpu }} / {{ node_info.max_cpu }}
+                       <div class="progress_max" id="node_cpu"></div></td>
+					   <td class="graph">{{ node_info.mem }} / {{ node_info.max_mem }}
+                       <div class="progress_max" id="node_mem"></div></td>
+				   </tr>
+			   </tbody>
+			   </table>
+			   </div>
+
+                <h4>
+                	<img src="/static/images/machines_mini.png" class="icons">
+                	&nbsp;仮想マシン
+                </h4>
+				<table class="button_select" cellspacing="0" cellpadding="0"><tr>
+				<td align="right">状態でフィルタ：
+				<select id="status" name="status" onChange="jump('/resource/nodeinfo/');" >
+	                  <option value="all" {% ifequal request.session.filter_status "all" %}selected{% endifequal %}>all</option>
+	                  <option value="pending" {% ifequal request.session.filter_status "pending" %}selected{% endifequal %}>pending</option>
+	                  <option value="running" {% ifequal request.session.filter_status "running" %}selected{% endifequal %}>running</option>
+	                  <option value="stopped" {% ifequal request.session.filter_status "stopped" %}selected{% endifequal %}>stopped</option>
+					  <option value="shutting-down" {% ifequal request.session.filter_status "shutting-down" %}selected{% endifequal %}>shutting-down</option>
+	                  <option value="terminated" {% ifequal request.session.filter_status "terminated" %}selected{% endifequal %}>terminated</option>
+                </select></td>
+                </tr></table>
+
+                <div class="instance_info_area">
+				<table class="instance_info" cellspacing="0" cellpadding="0">
+				<thead>
+					<tr>
+						<th>&nbsp;&nbsp;&nbsp;&nbsp;</th>
+						<th>インスタンスID <img class="sort" id="sinstanceid" src="/static/images/sort_default.png" onClick="sortInstance();"/></th>
+						<th>起動ノードIP <img class="sort" id="snodeip" src="/static/images/sort_default.png"  onClick="sortNode();"/></th>
+						<th>CPU(コア)</th>
+						<th>メモリ(MB)</th>
+						<th>起動タイプ <img class="sort" id="srootdevicetype" src="/static/images/sort_default.png"  onClick="sortRootdev();"/></th>
+						<th>使用EBS数</th>
+						<th>状態</th>
+					</tr>
+				</thead>
+				<tbody>
+				{% for entry in instance_list %}
+
+   				   {% ifequal entry.instanceid selected_instance %}
+   				   <tr><td colspan=9>
+   				   <table class="instance_info inner">
+						<tr>
+							<td rowspan="4" class="extract" onClick="extract('none');">&#x25bc;
+							   {% ifequal entry.rootdevicetype "ebs" %}
+							   		<img class="icons" src="/static/images/ebsboot_machine_tin.png">
+							   {% else %}
+							   		<img class="icons" src="/static/images/virtual_machine_tin.png">
+							   {% endifequal %}
+					   		</td>
+							<th>インスタンスID</th>
+							<th>アカウント名</th>
+							<th>起動ノードIP</th>
+							<th>CPU</th>
+							<th>メモリ</th>
+							<th>起動タイプ</th>
+							<th>使用EBS数</th>
+							<th>状態</th>
+						</tr>
+   				   		<tr>
+						   <td>{{ entry.instanceid }}</td>
+						   <td>{{ entry.account }}</td>
+						   <td>{{ entry.node }}</td>
+						   <td>{{ entry.cpu }}</td>
+						   <td>{{ entry.mem }}</td>
+						   <td>{{ entry.rootdevicetype }}</td>
+						   <td>{{ entry.num_volumes }}</td>
+						   <td><img src="/static/images/stat_{{entry.status}}.png" alt="{{entry.status}}" class="icons"> {{ entry.status }}</td>
+						</tr>
+						<tr>
+							<th>パブリックIP</th>
+							<th>プライベートIP</th>
+							<th>イメージID</th>
+							<th colspan=3>起動時間</th>
+							<th colspan=2>EBSボリュームID</th>
+						</tr>
+   				   		<tr>
+						   <td>{{ entry.ipaddress }}</td>
+						   <td>{{ entry.privateipaddress }}</td>
+						   <td>{{ entry.imageid }}</td>
+						   <td colspan=3>{{ entry.launchtime }}</td>
+						   <td colspan=2>
+						   {% for vol in entry.attachedvolumes %}
+						   		{{vol}}&nbsp;
+						   {% endfor %}
+						   </td>
+						</tr>
+					</table>
+					</td></tr>
+   				   {% else %}
+				   <tr>
+					   <td class="extract" onClick="extract({{forloop.counter0}});">&#x25b6;</td>
+					   {% ifequal entry.rootdevicetype "ebs" %}
+					   		<td><table class="inner2"><tr><td class="icon"><img class="icons" src="/static/images/ebsboot_machine_tin.png"></td><td>{{ entry.instanceid }}</td></tr></table></td>
+					   {% else %}
+					   		<td><table class="inner2"><tr><td class="icon"><img class="icons" src="/static/images/virtual_machine_tin.png"></td><td>{{ entry.instanceid }}</td></tr></table></td>
+					   {% endifequal %}
+					   <td>{{ entry.node }}</td>
+					   <td>{{ entry.cpu }}</td>
+					   <td>{{ entry.mem }}</td>
+					   <td>{{ entry.rootdevicetype }}</td>
+					   <td>{{ entry.num_volumes }}</td>
+					   <td><img src="/static/images/stat_{{entry.status}}.png" alt="{{entry.status}}" class="icons"> {{ entry.status }}</td>
+				   </tr>
+				   {% endifequal %}
+
+			   {% endfor %}
+			   </tbody>
+			   </table>
+			</div>
+             </div><!--  right contents end -->
+
+            </div><!-- main contents (left, right) end -->
+{% endblock %}

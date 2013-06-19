@@ -1,0 +1,300 @@
+{% extends "oss_base.html" %}
+
+{% comment %}
+# COPYRIGHT FUJITSU SOCIAL SCIENCE LABORATORY LIMITED 2012
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without modification,
+# are permitted provided that the following conditions are met:
+#
+# + Redistributions of source code must retain the above copyright notice, this list of conditions
+# and the following disclaimer.
+# + Redistributions in binary form must reproduce the above copyright notice, this list of conditions
+# and the following disclaimer in the documentation and/or other materials provided with the distribution.
+# + Neither the name of the FUJITSU SOCIAL SCIENCE LABORATORY LIMITED nor the names of its contributors
+# may be used to endorse or promote products derived from this software without specific prior written
+# permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+# IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+# FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+# CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+{% endcomment %}
+
+{% block title %}Cocuuma{% endblock title %}
+
+{% block link %}
+<link  href="/static/css/report.css" rel="stylesheet" type="text/css" />
+{% endblock link %}
+
+{% block script %}
+<script src="/static/js/report.js" type="text/javascript"></script>
+{% endblock script %}
+
+{% block content %}
+            <!-- main contents (left, right) start -->
+            <div id="main_contents">
+
+                <!-- left contents start -->
+                <div id="left_contents">
+
+                </div><!-- left contents end -->
+
+                <!-- right contents start -->
+                <div id="right_contents">
+                    <div id="right_contents_header">
+                        <h2><img src="/static/images/dashboard.png" class="icons">&nbsp;リソース使用レポート</h2>
+                    </div>
+
+					{% for error in errors %}
+					<br><br>
+					<div class="err_msg">{{error}}</div>
+					{% endfor %}
+
+					{% ifequal request.session.account_admin "yes" %}
+					<b>アカウント:</b>
+					<select id="account_select" name="account_selected" onChange="changeAccount();">
+						<option value="all" >-- all accounts --</option>
+						{% for ac in request.session.ss_account_list %}
+						    {% ifequal ac.id_number request.session.account_selected %}
+							    <option value="{{ac.id_number}}" selected>{{ac.name}}</option>
+							{% else %}
+							    <option value="{{ac.id_number}}">{{ac.name}}</option>
+							{% endifequal %}
+						{% endfor %}
+					</select>
+					{% else %}
+					<input type="hidden" name="account_selected" value="{{request.session.account_selected}}">
+					{% endifequal %}
+					{% ifequal request.session.user_admin "yes" %}
+					{% ifnotequal request.session.account_selected "all" %}
+						<b>ユーザ:</b>
+						<select id="user_select" name="user_selected" onChange="changeUser();">
+							<option value="all" >-- all user --</option>
+							{% for u in request.session.ss_user_list %}
+							    {% ifequal u.user_internal_id request.session.user_selected %}
+								    <option value="{{u.user_internal_id}}" selected>{{u.user_id}}</option>
+								{% else %}
+								    <option value="{{u.user_internal_id}}">{{u.user_id}}</option>
+								{% endifequal %}
+							{% endfor %}
+						</select>
+					{% endifnotequal %}
+					{% else %}
+					<input type="hidden" name="user_selected" value="{{request.session.user_selected}}">
+					{% endifequal %}
+					<b>レポート月:</b>
+					<select id="month_select" name="month_selected" onChange="jump('/report/');">
+						<option value="all" >-- all --</option>
+						{% for m in request.session.ss_month_list %}
+						    {% ifequal m request.session.month_selected %}
+							    <option value="{{m}}" selected>{{m}}</option>
+							{% else %}
+							    <option value="{{m}}">{{m}}</option>
+							{% endifequal %}
+						{% endfor %}
+					</select>
+
+                    <h3>
+                    	<img src="/static/images/dashboard_mini.png" class="icons">
+                    	&nbsp;使用量レポート
+						{% ifequal request.session.pointdisplay "yes" %}
+							<input type="hidden" name="pointdisplay" value="yes">
+                    		<input type="button" onclick="pointOff()" value="ポイント非表示"/>
+						{% else %}
+							<input type="hidden" name="pointdisplay" value="no">
+                    		<input type="button" onclick="pointOn()" value="ポイント表示"/>
+						{% endifequal %}
+                    	<input type="button" id="return_button" onclick="jump('/dashboard/')" value="戻る"/>
+                    </h3>
+                    <h4>仮想マシン使用量</h4>
+                    <div class="instance_info_area">
+						<table class="instance_info" cellpadding="0" cellspacing="0">
+							<thead>
+								<tr>
+									<th class="index">&nbsp;</th>
+									<th>仮想マシン作成(回)</th>
+									<th>コア(cores*h)</th>
+									<th>メモリ(GB*h)</th>
+									<th>ディスクIO(GB)</th>
+									<th>ネットワークIO(GB)</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr class="odd">
+									<th>使用量</th>
+									<td>{{request.session.ss_sum_instance.bootups}}</td>
+									<td>{{request.session.ss_sum_instance.cores_by_hours}}</td>
+									<td>{{request.session.ss_sum_instance.memgigabytes_by_hours}}</td>
+									<td>{{request.session.ss_sum_instance.disk_io_gigabytes}}</td>
+									<td>{{request.session.ss_sum_instance.network_io_gigabytes}}</td>
+								</tr>
+								{% ifequal request.session.pointdisplay "yes" %}
+								<tr class="odd">
+									<th>ポイント単価＠</th>
+									<td>{{request.session.ss_charge_at.boot}}</td>
+									<td>{{request.session.ss_charge_at.cpu}}</td>
+									<td>{{request.session.ss_charge_at.mem}}</td>
+									<td>{{request.session.ss_charge_at.disk}}</td>
+									<td>{{request.session.ss_charge_at.net}}</td>
+								</tr>
+								<tr class="even">
+									<th>使用ポイント</th>
+									<td>{{request.session.ss_charge.bootups}}</td>
+									<td>{{request.session.ss_charge.cores}}</td>
+									<td>{{request.session.ss_charge.mem}}</td>
+									<td>{{request.session.ss_charge.disk_io}}</td>
+									<td>{{request.session.ss_charge.net_io}}</td>
+								</tr>
+								{% endifequal %}
+							</tbody>
+						</table>
+					</div>
+                    <h4>データボリューム使用量</h4>
+                    <div class="instance_info_area">
+						<table class="instance_info" cellpadding="0" cellspacing="0">
+							<thead>
+								<tr>
+									<th class="index">&nbsp;</th>
+									<th>EBSボリューム(GB*h)</th>
+									<th>バックアップボリューム(GB*h)</th>
+									<th>Walrusファイルサーバ(GB*h)</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr class="odd">
+									<th>使用量</th>
+									<td>{{request.session.ss_sum_volume.ebs_gigabytes_by_hours}}</td>
+									<td>{{request.session.ss_sum_volume.snapshot_gigabytes_by_hours}}</td>
+									<td>{{request.session.ss_sum_walrus.walrus_gigabytes_by_hours}}</td>
+								</tr>
+								{% ifequal request.session.pointdisplay "yes" %}
+								<tr class="odd">
+									<th>ポイント単価＠</th>
+									<td>{{request.session.ss_charge_at.ebs}}</td>
+									<td>{{request.session.ss_charge_at.snapshot}}</td>
+									<td>{{request.session.ss_charge_at.walrus}}</td>
+								</tr>
+								<tr class="even">
+									<th>使用ポイント</th>
+									<td>{{request.session.ss_charge.ebs}}</td>
+									<td>{{request.session.ss_charge.snapshot}}</td>
+									<td>{{request.session.ss_charge.walrus}}</td>
+								</tr>
+								{% endifequal %}
+							</tbody>
+						</table>
+					</div>
+					{% ifequal request.session.pointdisplay "yes" %}
+                    <h4>総使用ポイント</h4>
+					<div align="right">
+						<table class="instance_info" cellpadding="0" cellspacing="0">
+							<tbody>
+								<tr class="even">
+									<th class="index">
+									{% ifequal request.session.month_selected "all" %}全期間の{% else %}{{request.session.month_selected}} {% endifequal %}使用ポイント</th>
+									<td>{{request.session.ss_charge.total}}</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					{% endifequal %}
+                    <h3><img src="/static/images/machines_mini.png" class="icons">&nbsp;仮想マシン使用記録</h3>
+                    <div class="instance_info_area">
+						<table class="instance_info" cellpadding="0" cellspacing="0">
+							<thead>
+								<tr>
+									<th>インスタンスID</th>
+									<th>cpuコア数</th>
+									<th>メモリ(GB)</th>
+									<th>開始時間</th>
+									<th>最終確認時間</th>
+									<th>配備(h)</th>
+									<th>稼働(h)</th>
+									<th>disk IO (Mb)</th>
+									<th>net IO (Mb)</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for ins in request.session.ss_repo_instancelist %}
+								<tr class="{% cycle 'odd' 'even' %}">
+									<td>{{ins.instance_id}}</td>
+									<td>{{ins.cores}}</td>
+									<td>{{ins.mem_gigabytes}}</td>
+									<td>{{ins.start_time}}</td>
+									<td>{{ins.last_seen_time}}</td>
+									<td>{{ins.duration_hour}}</td>
+									<td>{{ins.running_hour}}</td>
+									<td>{{ins.disk_io}}</td>
+									<td>{{ins.network_io}}</td>
+								</tr>
+								{% endfor %}
+							</tbody>
+						</table>
+                    </div>
+                    <h3><img src="/static/images/storage_mini.png" class="icons">&nbsp;データボリューム使用記録</h3>
+                    <div class="instance_info_area">
+						{% for h in request.session.ss_repo_volumehistory %}
+						{% ifnotequal h.user_id "none" %}
+							{{ h.user_id }}{% ifnotequal h.account_name "none" %}@{{ h.account_name }}{% endifnotequal %}
+						{% endifnotequal %}
+						<table class="instance_info" cellpadding="0" cellspacing="0">
+							<thead>
+								<tr>
+									<th>期間</th>
+									<th>使用時間(h)</th>
+									<th>EBSボリューム総容量(Mb)</th>
+									<th>バックアップボリューム総容量(Mb)</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for hh in h.history %}
+								<tr class="{% cycle 'odd' 'even' %}">
+									<td>{{hh.start_time}}～{{hh.end_time}}</td>
+									<td>{{hh.duration_hour}}</td>
+									<td>{{hh.ebs_megabytes}}</td>
+									<td>{{hh.snapshot_megabytes}}</td>
+								</tr>
+								{% endfor %}
+							</tbody>
+						</table>
+						{% endfor %}
+                    </div>
+                    <h3><img src="/static/images/storage_mini.png" class="icons">&nbsp;Walrus使用記録</h3>
+                    <div class="instance_info_area">
+						{% for h in request.session.ss_repo_walrushistory %}
+						{% ifnotequal h.user_id "none" %}
+							{{ h.user_id }}{% ifnotequal h.account_name "none" %}@{{ h.account_name }}{% endifnotequal %}
+						{% endifnotequal %}
+						<table class="instance_info" cellpadding="0" cellspacing="0">
+							<thead>
+								<tr>
+									<th>期間</th>
+									<th>使用時間(h)</th>
+									<th>Walrus総容量(Mb)</th>
+									<th>オブジェクト数(Mb)</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for hh in h.history %}
+								<tr class="{% cycle 'odd' 'even' %}">
+									<td>{{hh.start_time}}～{{hh.end_time}}</td>
+									<td>{{hh.duration_hour}}</td>
+									<td>{{hh.objects_megabytes}}</td>
+									<td>{{hh.objects_num}}</td>
+								</tr>
+								{% endfor %}
+							</tbody>
+						</table>
+						{% endfor %}
+                    </div>
+
+                </div><!--  right contents end -->
+
+            </div><!-- main contents (left, right) end -->
+
+{% endblock content %}

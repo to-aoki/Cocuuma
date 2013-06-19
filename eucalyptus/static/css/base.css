@@ -1,0 +1,212 @@
+/*
+#
+# COPYRIGHT FUJITSU SOCIAL SCIENCE LABORATORY LIMITED 2012
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without modification,
+# are permitted provided that the following conditions are met:
+#
+# + Redistributions of source code must retain the above copyright notice, this list of conditions
+# and the following disclaimer.
+# + Redistributions in binary form must reproduce the above copyright notice, this list of conditions
+# and the following disclaimer in the documentation and/or other materials provided with the distribution.
+# + Neither the name of the FUJITSU SOCIAL SCIENCE LABORATORY LIMITED nor the names of its contributors
+# may be used to endorse or promote products derived from this software without specific prior written
+# permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+# IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+# FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+# CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+*/
+
+body {
+    font: 12px 'メイリオ',Meiryo,'ＭＳ Ｐゴシック',sans-serif;
+    min-width: 1100px;
+    word-break:break-all;
+}
+
+/* main container */
+#main {
+    margin:0 auto;
+}
+
+/* header */
+#header {
+    position:relative;
+    height:32px;
+    padding:0px 0 0 0;
+    margin: 0 0 15px 0;
+}
+
+/* site logo */
+#logo {
+    position:absolute;
+    top:2px;
+    left:5px;
+    }
+
+/*site name*/
+#site_name{
+    position: absolute;
+    top:4px;
+    left:60px;
+    font:20px 'Cooper Black', sans-serif,'メイリオ',Meiryo;
+    color: #3E3E3E;
+}
+
+/*header_right*/
+#header_right{
+    float: right;
+    margin:6px 20px 0 0;
+}
+
+#header_right span{
+    font-size: 15px;
+}
+
+#header_right #user_id{
+    float: left;
+    margin:0 35px 0 0;
+}
+#header_right #date{
+    float: left;
+    margin:0 35px 0 0;
+}
+
+#header_right #logout{
+    color:#60635A;
+    text-decoration: underline;
+}
+#header_right #logout:hover{
+    color:#60635A;
+    text-decoration: underline;
+}
+/* contents */
+#contents_wrapper {
+    float: left;
+    width:99%;
+    min-height: 512px;
+    background:#ffffff;
+    padding:10px 0 0 0;
+    margin: 0 0px 0 7px;
+    font-size: 12px;
+    color: #3E3E3E;
+    }
+/*menu*/
+#menu {
+    float:left;
+    padding:0 0 0 12px;
+    width:180px;
+    }
+
+#menu ul.nav {
+    margin:0 0 10px 0;
+    padding:0;
+    border:1px solid #666666;
+    list-style:none;
+    }
+
+#menu ul.nav li.menu_list {
+    padding:0 4px 0 5px;
+    height:40px;
+    margin:0 0 0 0;
+    }
+
+#menu ul.nav li.menu_list:hover {
+    cursor: pointer;
+    }
+#menu ul.nav .menu_text{
+    margin: 5px 0 0 10px;
+}
+#menu ul.nav .menu_selected_text{
+    display: inline-block;
+    width:8px;
+    color: #a69226;
+    font-weight: bold;
+}
+
+#menu ul.button {
+    margin:0 0 8px 0;
+    padding:0;
+    border:1px solid #666666;
+    list-style:none;
+    padding:0;
+    }
+
+#menu ul.button li.create_list {
+    padding:4px 6px;
+    margin:0;
+    font-weight:bold;
+    }
+
+#menu ul.button li.create_list:hover {
+    cursor: pointer;
+    }
+#menu table.inner {
+    padding:5px 0px;
+}
+#menu table.inner tr td:first-child {
+    width:130px;
+    vertical-align:top;
+}
+#menu table.inner tr td:last-child {
+    width:30px;
+}
+
+/*left_contents*/
+#left_contents{
+    float: left;
+    width: 180px;
+}
+
+/* right_contents */
+#right_contents {
+    float:left;
+    display:inline-block;
+    width:650px;
+    margin:0 0 15px 30px;
+    }
+/* header_right_contents */
+#right_contents_header {
+    width:645px;
+    margin:0 0 12px 0;
+    }
+/* footer */
+#footer {
+    float:left;
+    width:100%;
+    min-width:1024px;
+    height:15px;
+    margin: 10px 0 0 0;
+    text-align: center;
+    }
+h2{
+    padding: 5px  0 5px 5px;
+}
+h3{
+    padding: 5px  0 5px 5px;
+}
+h4{
+    margin:5px 0 5px 5px;
+    padding:0 0 0 5px;
+}
+
+span.not_bold {
+    font-weight: normal;
+    font-size: 12px;
+}
+
+img.icons { vertical-align: middle; }
+
+/* エラーメッセージ */
+.err_msg {
+	font-weight:bold;
+	color:#FF4444;
+	padding:8px 5px 0px 16px;
+}

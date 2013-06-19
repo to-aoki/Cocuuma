@@ -1,0 +1,159 @@
+/*
+#
+# COPYRIGHT FUJITSU SOCIAL SCIENCE LABORATORY LIMITED 2012
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without modification,
+# are permitted provided that the following conditions are met:
+#
+# + Redistributions of source code must retain the above copyright notice, this list of conditions
+# and the following disclaimer.
+# + Redistributions in binary form must reproduce the above copyright notice, this list of conditions
+# and the following disclaimer in the documentation and/or other materials provided with the distribution.
+# + Neither the name of the FUJITSU SOCIAL SCIENCE LABORATORY LIMITED nor the names of its contributors
+# may be used to endorse or promote products derived from this software without specific prior written
+# permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+# IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+# FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+# CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+*/
+
+#right_contents {
+    width:800px;
+    }
+#right_contents_header{
+    width: 800px;
+}
+
+.asterisk{
+    color: #CF0000;
+}
+.vmachine_info_area{
+    clear:both;
+    margin: 5px 0 0 0;
+    padding: 5px 0 0 0;
+}
+table.vmachine_info {
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    border-collapse:collapse;
+    }
+
+table.vmachine_info tr.even{
+    background-color: #f4f4f4;
+    }
+table.vmachine_info td{
+    border: 1px solid #9097A9;
+    }
+
+table.vmachine_info td {
+    padding: 3px 5px;
+    text-align: left;
+    }
+    
+table.vmachine_info tr td:first-child {
+    width:150px;
+    }
+
+#cancel_or_next{
+    margin: 10px 0 0 0;
+    float: right;
+}
+
+/*table.progress_tracker{
+    text-align:center;
+    border-collapse:collapse;
+    background-color: #FFFFE0;
+}
+table.progress_tracker tr td{
+    width:100px;
+}
+table.progress_tracker tr td.allow {
+	border-left:1px solid #000000;
+	border-right:1px solid #000000;
+}
+table.progress_tracker tr td.allow img{
+    margin:0 0 -10px 0;
+}
+
+table.progress_tracker tr td.track-done-left {
+	border-top:10px ridge #FF8C00;
+	border-left:1px solid #000000;
+}
+table.progress_tracker tr td.track-done-right {
+    border-top:10px ridge #FF8C00;
+    border-right:1px solid #000000;
+}
+
+table.progress_tracker tr td.track-current-left {
+	border-top:10px ridge #FF8C00;
+	border-left:1px solid #000000;
+}
+
+table.progress_tracker tr td.track-current-right {
+	border-top:3px dashed #000000;
+	border-right:1px solid #000000;
+}
+
+table.progress_tracker tr td.track-future-left {
+	border-top:3px dashed #000000;
+	border-left:1px solid #000000;
+}
+table.progress_tracker tr td.track-future-right {
+    border-top:3px dashed #000000;
+    border-right:1px solid #000000;
+}*/
+table.progress_tracker{
+    text-align: center;
+    border-collapse: collapse;
+}
+table.progress_tracker #first_column,
+table.progress_tracker #second_column,
+table.progress_tracker #third_column{
+    width: 180px;
+    padding: 2px;
+    font-size: 13px;
+}
+
+#first_column{
+    border-right: 2px solid #FFFFFF;
+}
+
+#second_column{
+    border-left: 2px solid #FFFFFF;
+    border-right: 2px solid #FFFFFF;
+}
+
+#third_column{
+    border-left: 2px solid #FFFFFF;
+}
+.future_column{
+    background-color: #cccccc;
+    color: #000000;
+    font-weight: bold;
+}
+
+.current_column{
+    color: #000000;
+    font-weight: bold;
+}
+.past_column{
+    background-color: #cccccc;
+    color: #000000;
+    font-weight: bold;
+}
+.radio_column{
+    width:30px !important;
+}
+
+input.text {
+    width:600px;
+    }

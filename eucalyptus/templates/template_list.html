@@ -1,0 +1,183 @@
+{% extends "oss_base.html" %}
+
+{% comment %}
+# COPYRIGHT FUJITSU SOCIAL SCIENCE LABORATORY LIMITED 2012
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without modification,
+# are permitted provided that the following conditions are met:
+#
+# + Redistributions of source code must retain the above copyright notice, this list of conditions
+# and the following disclaimer.
+# + Redistributions in binary form must reproduce the above copyright notice, this list of conditions
+# and the following disclaimer in the documentation and/or other materials provided with the distribution.
+# + Neither the name of the FUJITSU SOCIAL SCIENCE LABORATORY LIMITED nor the names of its contributors
+# may be used to endorse or promote products derived from this software without specific prior written
+# permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+# IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+# FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+# CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+{% endcomment %}
+
+{% block title %}Cocuuma{% endblock title %}
+
+{% block link %}
+	<link href="/static/css/template_list.css" rel="stylesheet" type="text/css" />
+{% endblock link %}
+
+{% block script %}
+	<script src="/static/js/template_list.js" type="text/javascript"></script>
+{% endblock script %}
+
+{% block content %}
+
+ 			<!-- main contents (left, right) start -->
+			<div id="main_contents">
+
+				<!-- left contents start -->
+				<div id="left_contents">
+					<ul class="nav">
+						<li onclick="jump('/template/createtemplate/')" class="cleate_template_menu" id="create_new_template">
+						    <table class="inner"><tr>
+						        <td><p>+テンプレート</p><p>新規作成</p></td>
+						        <td><img src="/static/images/new_template_mini.png"></td>
+						    </tr></table></li>
+						</li>
+						<li class="left_contents_index" >
+							<div class="">システムテンプレート</div>
+						</li>
+						{% for t in template_model_List %}
+							{% if t.kind == 1 %}
+								{% if forloop.counter0 == request.session.ss_tpl_selectNumber %}
+									<li class="left_contents_item selected_template" onclick="location.href='/template/{{t.id}}/'">
+								{% else %}
+									<li class="left_contents_item" onclick="location.href='/template/{{t.id}}/'">
+								{% endif %}
+								    <table class="inner"><tr>
+								        <td>{{t.name}}</td>
+								        <td><img src="/static/images/template_tin.png"></td>
+								    </tr></table></li>
+							{% endif %}
+						{% endfor %}
+                        <li class="left_contents_index">
+							<div class="">マイテンプレート</div>
+						</li>
+						{% for t in template_model_List %}
+							{% if t.kind == 0 %}
+								{% if request.session.ss_usr_user.id == t.user.id %}
+									{% if forloop.counter0 == request.session.ss_tpl_selectNumber %}
+										<li class="left_contents_item selected_template" onclick="location.href='/template/{{t.id}}/'">
+									{% else %}
+										<li class="left_contents_item" onclick="location.href='/template/{{t.id}}/'">
+									{% endif %}
+								    <table class="inner"><tr>
+								        <td>{{t.name}}</td>
+								        <td><img src="/static/images/template_tin.png"></td>
+								    </tr></table></li>
+								{% endif %}
+							{% endif %}
+						{% endfor %}
+                    </ul>
+				</div><!-- left contents end -->
+
+				<!-- right contents start -->
+				<div id="right_contents">
+					<div id="right_contents_header">
+						<h2><img src="/static/images/template.png" class="icons">&nbsp;テンプレート</h2>
+						{% for t in template_model_List %}
+							{% if forloop.counter0 == request.session.ss_tpl_selectNumber %}
+								{% if t.user.id == request.session.ss_usr_user.id%}
+									<input type="button" onclick="confirmJump('このテンプレートを削除しますか？','/template/deltemplate/')" value="テンプレート削除"/>
+									<input type="button" onclick="jump('/template/modtemplate/')" value="テンプレート編集"/>
+								{% endif %}
+							{% endif %}
+						{% endfor %}
+					</div>
+					<div class="template_info_area">
+					{% if 'ss_tpl_selectNumber' in request.session %}
+						{% for t in template_model_List %}
+							{% if forloop.counter0 == request.session.ss_tpl_selectNumber %}
+						<table class="template_info" cellpadding="0" cellspacing="0">
+							<tr>
+								<td>テンプレート名</td>
+								<td>{{t.name}}</td>
+							</tr>
+							<tr>
+								<td>説明</td>
+								<td>{{t.description}}</td>
+							</tr>
+							<tr>
+								<td>テンプレート管理ユーザー名</td>
+								<td>{{t.user.name}}</td>
+							</tr>
+							<tr>
+								<td>起動イメージ名</td>
+								<td>{{t.image.name}}</td>
+							</tr>
+							<tr>
+								<td>起動イメージ説明</td>
+								<td>{{t.image.description}}</td>
+							</tr>
+							<tr>
+								<td>起動イメージマニフェスト</td>
+								<td>{{t.image.location}}</td>
+							</tr>
+							<tr class="detail">
+								<td>起動イメージID</td>
+								<td>{{t.image.id}}</td>
+							</tr>
+							<tr class="detail">
+								<td>起動イメージ所有者</td>
+								<td>{{t.image.ownername}}</td>
+							</tr>
+							<tr class="detail">
+								<td>起動イメージ状態</td>
+								<td>{{t.image.state}}</td>
+							</tr>
+							<tr class="detail">
+								<td>起動イメージ可視性</td>
+								<td>{{t.image.is_public}}</td>
+							</tr>
+							<tr class="detail">
+								<td>起動イメージアーキテクチャ</td>
+								<td>{{t.image.architecture}}</td>
+							</tr>
+							<tr class="detail">
+								<td>起動イメージルートデバイス</td>
+								<td>{{t.image.root_device_type}}</td>
+							</tr>
+
+							<tr>
+								<td>起動タイプ</td>
+								<td>{{t.vmtype.full_name}}</td>
+							</tr>
+							<tr>
+								<td>起動イメージ数</td>
+								<td>{{t.count}}</td>
+							</tr>
+							<tr>
+								<td class="table_button">
+									<input type="button"  id="switch_display_button" value="↓詳細表示"  onclick="switchDisplay(this)"/>
+								</td>
+								<td class="table_button_right"></td>
+							</tr>
+						</table>
+							{% endif %}
+						{% endfor %}
+					</div>
+					{% else %}
+
+						<p>操作対象を選択またはテンプレート作成を行ってください。</p>
+						<img alt="koala_icon" src="/static/images/koala_transparent.png" />
+					{% endif %}
+                </div><!-- right contents end -->
+
+            </div><!-- main contents (left, right) end -->
+
+{% endblock content %}

@@ -1,0 +1,515 @@
+<!--
+# COPYRIGHT FUJITSU SOCIAL SCIENCE LABORATORY LIMITED 2012
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without modification,
+# are permitted provided that the following conditions are met:
+#
+# + Redistributions of source code must retain the above copyright notice, this list of conditions
+# and the following disclaimer.
+# + Redistributions in binary form must reproduce the above copyright notice, this list of conditions
+# and the following disclaimer in the documentation and/or other materials provided with the distribution.
+# + Neither the name of the FUJITSU SOCIAL SCIENCE LABORATORY LIMITED nor the names of its contributors
+# may be used to endorse or promote products derived from this software without specific prior written
+# permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+# IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+# FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+# CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-->
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Cocuuma</title>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta name="copyright" content="COPYRIGHT FUJITSU SOCIAL SCIENCE LABORATORY LIMITED 2012">
+	{% ifequal request.session.ss_sys_menu "resource" %}
+		<link href="/static/css/color_cream.css" rel="stylesheet" type="text/css" />
+	{% else %}
+		{% ifequal request.session.ss_sys_menu "access_adm" %}
+			<link href="/static/css/color_darkorange.css" rel="stylesheet" type="text/css" />
+		{% else %}
+			{% if request.session.ss_usr_user.admin %}
+				<link href="/static/css/color_earth.css" rel="stylesheet" type="text/css" />
+			{% else %}
+				<link href="/static/css/color.css" rel="stylesheet" type="text/css" />
+			{% endif %}
+		{% endifequal %}
+	{% endifequal %}
+	<link href="/static/css/reset.css" rel="stylesheet" type="text/css" />
+	<link href="/static/css/base.css" rel="stylesheet" type="text/css" />
+	{% block link %}{% endblock link %}
+	<script src="/static/js/jquery-1.7.2.min.js" type="text/javascript"></script>
+	<script src="/static/js/menu.js" type="text/javascript"></script>
+	<script type="text/javascript">
+
+	function jump(jumpURL){
+		document.getElementById('form1').action = jumpURL;
+		document.getElementById('form1').submit();
+	}
+
+	function confirmJump(confirmMsg, jumpURL) {
+		if( confirm(confirmMsg) ) {
+			jump(jumpURL);
+		}
+	}
+
+</script>
+    {% block script %}{% endblock script %}
+</head>
+<body>
+<form id="form1" action="{% block action %}{% endblock action %}" method="post">{% csrf_token %}
+	<!-- main container start-->
+	<div id="main">
+		<!-- header start-->
+		<div id="header">
+		<a href="#" id="logo"><img src="/static/images/koala_64.png"  width="50%" height="50%" alt="" /></a>
+		<span id="site_name">{% block title %}Cocuuma{% endblock title %}</span>
+			<div id="header_right">
+				<span id="date">{{request.session.ss_usr_lastlogin}}</span>
+				<div id="user_id">
+					<img class="icons" src="/static/images/user_tin.png">
+					<span id="user_id static">ユーザー名:</span>
+					<span id="user_id_val">{{request.session.ss_usr_user.name}}</span>
+				</div>
+				<a href="/logout/" id="logout_wrap">
+					<span id="logout">ログアウト</span>
+				</a>
+			</div>
+		</div><!-- header end-->
+
+		<!-- contents wrapper(menu, contents) start-->
+		<div id="contents_wrapper">
+
+			<!-- menu start -->
+			<div id="menu">
+
+			{% ifequal request.session.ss_sys_menu "resource" %}
+			<!-- 管理メニュー -->
+				<ul class="nav">
+				{% with request.session.ss_sys_resource_menu as menu %}
+					{% ifequal menu "instance_list" %}
+						<li class="menu_list selected">
+							<table class="inner"><tr><td>
+								<span class="menu_selected_text">&gt;</span><span class="menu_text">仮想マシン</span>
+							</td><td>
+								<img src="/static/images/machines_tin.png">
+							</td></tr></table>
+						</li>
+					{% else %}
+						<li onclick="location.href='/resource/instancelist/'" class="menu_list unselected">
+							<table class="inner"><tr><td>
+								<span class="menu_selected_text"></span><span class="menu_text">仮想マシン</span>
+							</td><td>
+								<img src="/static/images/machines_tin.png">
+							</td></tr></table>
+						</li>
+					{% endifequal %}
+
+					{% ifequal menu "account_views" %}
+						<li class="menu_list selected">
+							<table class="inner"><tr><td>
+								<span class="menu_selected_text">&gt;</span><span class="menu_text">アカウント</span>
+							</td><td>
+								<img src="/static/images/account_tin.png">
+							</td></tr></table>
+						</li>
+					{% else %}
+						<li onclick="location.href='/resource/accountlist/'" class="menu_list unselected">
+							<table class="inner"><tr><td>
+								<span class="menu_selected_text"></span><span class="menu_text">アカウント</span>
+							</td><td>
+								<img src="/static/images/account_tin.png">
+							</td></tr></table>
+						</li>
+					{% endifequal %}
+
+					{% ifequal menu "node_views" %}
+						<li class="menu_list selected">
+							<table class="inner"><tr><td>
+								<span class="menu_selected_text">&gt;</span><span class="menu_text">ホスト</span>
+							</td><td>
+								<img src="/static/images/node_tin.png">
+							</td></tr></table>
+						</li>
+					{% else %}
+						<li onclick="location.href='/resource/hostlist/'" class="menu_list unselected">
+							<table class="inner"><tr><td>
+								<span class="menu_selected_text"></span><span class="menu_text">ホスト</span>
+							</td><td>
+								<img src="/static/images/node_tin.png">
+							</td></tr></table>
+						</li>
+					{% endifequal %}
+
+					{% ifequal menu "volume_list" %}
+						<li class="menu_list selected">
+							<table class="inner"><tr><td>
+								<span class="menu_selected_text">&gt;</span><span class="menu_text">データボリューム</span>
+							</td><td>
+								<img src="/static/images/storage_tin.png">
+							</td></tr></table>
+						</li>
+					{% else %}
+						<li onclick="location.href='/resource/volumelist/'" class="menu_list unselected">
+							<table class="inner"><tr><td>
+								<span class="menu_selected_text"></span><span class="menu_text">データボリューム</span>
+							</td><td>
+								<img src="/static/images/storage_tin.png">
+							</td></tr></table>
+						</li>
+					{% endifequal %}
+
+					{% ifequal menu "snapshot_list" %}
+						<li class="menu_list selected">
+							<table class="inner"><tr><td>
+								<span class="menu_selected_text">&gt;</span><span class="menu_text">スナップショット</span>
+							</td><td>
+								<img src="/static/images/snapshot_tin.png">
+							</td></tr></table>
+						</li>
+					{% else %}
+						<li onclick="location.href='/resource/snapshotlist/'" class="menu_list unselected">
+							<table class="inner"><tr><td>
+								<span class="menu_selected_text"></span><span class="menu_text">スナップショット</span>
+							</td><td>
+								<img src="/static/images/snapshot_tin.png">
+							</td></tr></table>
+						</li>
+					{% endifequal %}
+
+					{% ifequal menu "property_list" %}
+						<li class="menu_list selected">
+							<table class="inner"><tr><td>
+								<span class="menu_selected_text">&gt;</span><span class="menu_text">クラウド設定</span>
+							</td><td>
+								<img src="/static/images/admin_tin.png">
+							</td></tr></table>
+						</li>
+					{% else %}
+						<li onclick="location.href='/resource/propertylist/'" class="menu_list unselected">
+							<table class="inner"><tr><td>
+								<span class="menu_selected_text"></span><span class="menu_text">クラウド設定</span>
+							</td><td>
+								<img src="/static/images/admin_tin.png">
+							</td></tr></table>
+						</li>
+					{% endifequal %}
+
+				{% endwith %}
+				</ul>
+
+				<ul class="button">
+					<li onclick="location.href='/dashboard/'" class="create_list">
+						<table><tr><td width=130 valign=top>
+							<span class="menu_selected_text"></span><span class="menu_text"><p>ユーザー・メニュー</p></span>
+						</td><td>
+							<img src="/static/images/user_mini.png">
+						</td></tr></table>
+					</li>
+				</ul>
+
+			{% else %}
+				{% ifequal request.session.ss_sys_menu "access_adm" %}
+				<ul class="nav">
+					{% ifequal request.session.ss_sys_useradm_menu "user_list_view" %}
+						<li class="menu_list selected">
+							<table class="inner"><tr><td>
+								<span class="menu_selected_text">&gt;</span><span class="menu_text">ユーザー</span>
+							</td><td>
+								<img src="/static/images/user_tin.png">
+							</td></tr></table>
+						</li>
+					{% else %}
+						<li onclick="location.href='/user_manage/'" class="menu_list unselected">
+							<table class="inner"><tr><td>
+								<span class="menu_selected_text"></span><span class="menu_text">ユーザー</span>
+							</td><td>
+								<img src="/static/images/user_tin.png">
+							</td></tr></table>
+						</li>
+					{% endifequal %}
+
+					{% ifequal request.session.ss_sys_useradm_menu "group_list_view" %}
+						<li class="menu_list selected">
+							<table class="inner"><tr><td>
+								<span class="menu_selected_text">&gt;</span><span class="menu_text">グループ</span>
+							</td><td>
+								<img src="/static/images/account_tin.png">
+							</td></tr></table>
+						</li>
+					{% else %}
+						<li onclick="location.href='/user_manage/group/'" class="menu_list unselected">
+							<table class="inner"><tr><td>
+								<span class="menu_selected_text"></span><span class="menu_text">グループ</span>
+							</td><td>
+								<img src="/static/images/account_tin.png">
+							</td></tr></table>
+						</li>
+					{% endifequal %}
+
+				</ul>
+				<ul class="button">
+					{% ifequal request.session.ss_sys_useradm_menu "group_list_view" %}
+							<li onclick="location.href='/user_manage/policy_set/'" class="create_list">
+								<table><tr><td width=130 valign=top>
+									<span class="menu_selected_text"></span><span class="menu_text"><p>権限セット管理</p></span>
+								</td><td>
+									<img src="/static/images/user_mini.png">
+								</td></tr></table>
+							</li>
+
+					{% else %}
+							<li onclick="location.href='/user_manage/policy_set/'" class="create_list">
+								<table><tr><td width=130 valign=top>
+									<span class="menu_selected_text"></span><span class="menu_text"><p>権限セット管理</p></span>
+								</td><td>
+									<img src="/static/images/user_mini.png">
+								</td></tr></table>
+							</li>
+					{% endifequal %}
+				</ul>
+
+
+					<ul class="button">
+						<li onclick="location.href='/dashboard/'" class="create_list">
+							<table><tr><td width=130 valign=top>
+								<span class="menu_selected_text"></span><span class="menu_text"><p>クラウド操作に戻る</p></span>
+							</td><td>
+								<img src="/static/images/user_mini.png">
+							</td></tr></table>
+						</li>
+					</ul>
+
+				{% else %}
+				<!-- ユーザメニュー -->
+					<ul class="nav">
+					{% with request.session.ss_sys_menu as menu %}
+						{% ifequal menu "dashboard" %}
+							<li class="menu_list selected">
+								<table class="inner"><tr><td>
+									<span class="menu_selected_text">&gt;</span><span class="menu_text">利用状況確認</span>
+								</td><td>
+									<img src="/static/images/dashboard_tin.png">
+								</td></tr></table>
+							</li>
+						{% else %}
+							<li onclick="location.href='/dashboard/'" class="menu_list unselected">
+								<table class="inner"><tr><td>
+									<span class="menu_selected_text"></span><span class="menu_text">利用状況確認</span>
+								</td><td>
+									<img src="/static/images/dashboard_tin.png">
+								</td></tr></table>
+							</li>
+						{% endifequal %}
+
+						{% if request.session.ss_usr_user.imagepermission %}
+							{% ifequal menu "image" %}
+								<li class="menu_list selected">
+									<table class="inner"><tr><td>
+										<span class="menu_selected_text">&gt;</span><span class="menu_text">仮想OSイメージ</span>
+									</td><td>
+										<img src="/static/images/OSImage_tin.png">
+									</td></tr></table>
+								</li>
+	                   		{% else %}
+								<li onclick="location.href='/image/top/'" class="menu_list unselected">
+									<table class="inner"><tr><td>
+										<span class="menu_selected_text"></span><span class="menu_text">仮想OSイメージ</span>
+									</td><td>
+										<img src="/static/images/OSImage_tin.png">
+									</td></tr></table>
+								</li>
+	                    	{% endifequal %}
+	                    {% endif %}
+
+						{% if request.session.ss_usr_user.templatepermission %}
+							{% ifequal menu "template" %}
+								<li class="menu_list selected">
+									<table class="inner"><tr><td>
+										<span class="menu_selected_text">&gt;</span><span class="menu_text">テンプレート</span>
+									</td><td>
+										<img src="/static/images/template_tin.png">
+									</td></tr></table>
+								</li>
+							{% else %}
+								<li onclick="location.href='/template/top/'" class="menu_list unselected">
+									<table class="inner"><tr><td>
+										<span class="menu_selected_text"></span><span class="menu_text">テンプレート</span>
+									</td><td>
+										<img src="/static/images/template_tin.png">
+									</td></tr></table>
+								</li>
+							{% endifequal %}
+   	                 {% endif %}
+
+						{% if request.session.ss_usr_user.machinepermission %}
+							{% ifequal menu "machine" %}
+								<li class="menu_list selected">
+									<table class="inner"><tr><td>
+										<span class="menu_selected_text">&gt;</span><span class="menu_text">仮想サーバ</span>
+									</td><td>
+										<img src="/static/images/machines_tin.png">
+									</td></tr></table>
+								</li>
+							{% else %}
+								{% if request.session.ss_mch_list|length > 0 %}
+									{% for mg in request.session.ss_mch_list %}
+										{% if mg == request.session.ss_mch_list|first %}
+											<li onclick="location.href='/machine/choice/{{mg.db.id}}/'" class="menu_list unselected">
+												<table class="inner"><tr><td>
+													<span class="menu_selected_text"></span><span class="menu_text">仮想サーバ</span>
+												</td><td>
+													<img src="/static/images/machines_tin.png">
+												</td></tr></table>
+											</li>
+										{% endif %}
+									{% endfor %}
+								{% else %}
+									<li onclick="location.href='/machine/'" class="menu_list unselected">
+										<table class="inner"><tr><td>
+											<span class="menu_selected_text"></span><span class="menu_text">仮想サーバ</span>
+										</td><td>
+											<img src="/static/images/machines_tin.png">
+										</td></tr></table>
+									</li>
+								{% endif %}
+							{% endifequal %}
+	                    {% endif %}
+
+						{% if request.session.ss_usr_user.addresspermission %}
+							{% ifequal menu "address" %}
+								<li class="menu_list selected">
+									<table class="inner"><tr><td>
+										<span class="menu_selected_text">&gt;</span><span class="menu_text">IPアドレス</span>
+									</td><td>
+										<img src="/static/images/elasticIP_tin.png">
+									</td></tr></table>
+								</li>
+							{% else %}
+								<li onclick="location.href='/address/'" class="menu_list unselected">
+									<table class="inner"><tr><td>
+										<span class="menu_selected_text"></span><span class="menu_text">IPアドレス</span>
+									</td><td>
+										<img src="/static/images/elasticIP_tin.png">
+									</td></tr></table>
+								</li>
+							{% endifequal %}
+	                    {% endif %}
+
+						{% if request.session.ss_usr_user.volumepermission %}
+							{% ifequal menu "volume" %}
+								<li class="menu_list selected">
+									<table class="inner"><tr><td>
+										<span class="menu_selected_text">&gt;</span><span class="menu_text">データボリューム</span>
+									</td><td>
+										<img src="/static/images/storage_tin.png">
+									</td></tr></table>
+								</li>
+							{% else %}
+								<li onclick="location.href='/volume/'" class="menu_list unselected">
+									<table class="inner"><tr><td>
+										<span class="menu_selected_text"></span><span class="menu_text">データボリューム</span>
+									</td><td>
+										<img src="/static/images/storage_tin.png">
+									</td></tr></table>
+								</li>
+							{% endifequal %}
+	                    {% endif %}
+
+						{% if request.session.ss_usr_user.keypairpermission %}
+							{% ifequal menu "keypair" %}
+								<li class="menu_list selected">
+									<table class="inner"><tr><td>
+										<span class="menu_selected_text">&gt;</span><span class="menu_text">仮想サーバ接続鍵</span>
+									</td><td>
+										<img src="/static/images/keyPair_tin.png">
+									</td></tr></table>
+								</li>
+							{% else %}
+								<li onclick="location.href='/keypair/'" class="menu_list unselected">
+									<table class="inner"><tr><td>
+										<span class="menu_selected_text"></span><span class="menu_text">仮想サーバ接続鍵</span>
+									</td><td>
+										<img src="/static/images/keyPair_tin.png">
+									</td></tr></table>
+								</li>
+							{% endifequal %}
+	                    {% endif %}
+
+						{% if request.session.ss_usr_user.securitygrouppermission %}
+							{% ifequal menu "securitygroup" %}
+								<li class="menu_list selected">
+									<table class="inner"><tr><td>
+										<span class="menu_selected_text">&gt;</span><span class="menu_text">ファイアウォール</span>
+									</td><td>
+										<img src="/static/images/firewall_tin.png">
+									</td></tr></table>
+								</li>
+							{% else %}
+								<li onclick="location.href='/securitygroup/'" class="menu_list unselected">
+									<table class="inner"><tr><td>
+										<span class="menu_selected_text"></span><span class="menu_text">ファイアウォール</span>
+									</td><td>
+										<img src="/static/images/firewall_tin.png">
+									</td></tr></table>
+							{% endifequal %}
+	                    {% endif %}
+					{% endwith %}
+					</ul>
+
+					<ul class="button">
+						<li onclick="location.href='/machine/groupcreate/'" class="create_list">
+							<table><tr><td width=130 valign=top>
+								<span class="menu_selected_text"></span><span class="menu_text"><p>＋仮想サーバ新規作成</p></span>
+							</td><td>
+								<img src="/static/images/new_machine_mini.png">
+							</td></tr></table>
+						</li>
+					</ul>
+
+					<ul class="button">
+						<li onclick="location.href='/user_manage/'" class="create_list">
+							<table><tr><td width=130 valign=top>
+								<span class="menu_selected_text"></span><span class="menu_text"><p>アクセス管理</p></span>
+							</td><td>
+								<img src="/static/images/account_mini.png">
+							</td></tr></table>
+						</li>
+					</ul>
+
+
+					{% if request.session.ss_usr_user.resource_admin %}
+					<ul class="button">
+						<li onclick="location.href='/resource/instancelist/'" class="create_list">
+							<table><tr><td width=130 valign=top>
+								<span class="menu_selected_text"></span><span class="menu_text"><p>管理者メニュー</p></span>
+							</td><td>
+								<img src="/static/images/admin_mini.png">
+							</td></tr></table>
+						</li>
+					</ul>
+					{% endif %}
+				{% endifequal %}
+			{% endifequal %}
+			</div><!-- menu end -->
+			{% block content %}<!-- メインエリア -->{% endblock content %}
+
+		 </div><!-- contents wrapper(menu, contents) end-->
+             <!-- footer start -->
+        <div id="footer">
+            <span>Copyright 2012
+                <a href="http://www.ssl.fujitsu.com/">FUJITSU SOCIAL SCIENCE LABORATORY LIMITED</a>
+            </span>
+        </div><!-- footer end -->
+
+    </div><!-- main container end-->
+</form>
+</body>
+</html>

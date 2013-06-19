@@ -1,0 +1,268 @@
+{% extends "oss_base.html" %}
+
+{% comment %}
+# COPYRIGHT FUJITSU SOCIAL SCIENCE LABORATORY LIMITED 2012
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without modification,
+# are permitted provided that the following conditions are met:
+#
+# + Redistributions of source code must retain the above copyright notice, this list of conditions
+# and the following disclaimer.
+# + Redistributions in binary form must reproduce the above copyright notice, this list of conditions
+# and the following disclaimer in the documentation and/or other materials provided with the distribution.
+# + Neither the name of the FUJITSU SOCIAL SCIENCE LABORATORY LIMITED nor the names of its contributors
+# may be used to endorse or promote products derived from this software without specific prior written
+# permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+# IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+# FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+# CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+{% endcomment %}
+
+{% block title %}Cocuuma{% endblock title %}
+
+{% block link %}
+	<link rel="stylesheet" href="/static/css/resource.css" />
+	<link href="/static/css/jquery.ui.progressbar.css" rel="stylesheet" type="text/css" />
+{% endblock %}
+
+{% block script %}
+	<script type="text/javascript" src="/static/js/host_list.js"></script>
+	<script src="/static/js/jquery.ui.core.js" type="text/javascript"></script>
+	<script src="/static/js/jquery.ui.widget.js" type="text/javascript"></script>
+	<script src="/static/js/jquery.ui.progressbar.js" type="text/javascript"></script>
+	<script type="text/javascript">
+		$(document).ready(function(){
+			{% for fe in frontend_list %}
+			value = {{fe.monitoring.cpu_used}};
+			$("#{{fe.hostname}}_cpu").progressbar();
+			$("#{{fe.hostname}}_cpu").progressbar("option", "value", value);
+			value = {{fe.monitoring.mem_used}} / {{fe.monitoring.mem_total}} * 100;
+			$("#{{fe.hostname}}_mem").progressbar();
+			$("#{{fe.hostname}}_mem").progressbar("option", "value", value);
+			value = {{fe.monitoring.disk_var_used}} / {{fe.monitoring.disk_var_total}} * 100;
+			$("#{{fe.hostname}}_disk").progressbar();
+			$("#{{fe.hostname}}_disk").progressbar("option", "value", value);
+			{% if fe.has_sc %}
+				value = {{fe.monitoring.disk_volume_used}} / {{fe.monitoring.disk_volume_total}} * 100;
+				$("#{{fe.hostname}}_volume").progressbar();
+				$("#{{fe.hostname}}_volume").progressbar("option", "value", value);
+			{% endif %}
+			{% if fe.has_walrus %}
+				value = {{fe.monitoring.disk_walrus_used}} / {{fe.monitoring.disk_walrus_total}} * 100;
+				$("#{{fe.hostname}}_walrus").progressbar();
+				$("#{{fe.hostname}}_walrus").progressbar("option", "value", value);
+			{% endif %}
+			{% endfor %}
+			{% for n in node_list %}
+			value = {{n.cpu}} / {{n.max_cpu}} * 100;
+			$("#node{{forloop.counter0}}cpu").progressbar();
+			$("#node{{forloop.counter0}}cpu").progressbar("option", "value", value);
+			value = {{n.mem}} / {{n.max_mem}} * 100;
+			$("#node{{forloop.counter0}}mem").progressbar();
+			$("#node{{forloop.counter0}}mem").progressbar("option", "value", value);
+			value = {{n.monitoring.cpu_used}};
+			$("#{{n.hostname}}_cpu").progressbar();
+			$("#{{n.hostname}}_cpu").progressbar("option", "value", value);
+			value = {{n.monitoring.mem_used}} / {{n.monitoring.mem_total}} * 100;
+			$("#{{n.hostname}}_mem").progressbar();
+			$("#{{n.hostname}}_mem").progressbar("option", "value", value);
+			value = {{n.monitoring.disk_var_used}} / {{n.monitoring.disk_var_total}} * 100;
+			$("#{{n.hostname}}_disk").progressbar();
+			$("#{{n.hostname}}_disk").progressbar("option", "value", value);
+			{% endfor %}
+		});
+    </script>
+
+{% endblock %}
+
+{% block content %}
+        <!-- main contents (left, right) start -->
+        <div id="main_contents">
+
+            <!-- left contents start -->
+            <div id="left_contents">
+
+            </div><!-- left contents end -->
+
+            <!-- right contents start -->
+            <div id="right_contents">
+                <div id="right_contents_header">
+                    <h2><img src="/static/images/node.png" class="icons">&nbsp;クラウド・ホスト情報</h2>
+                </div>
+
+				{% for error in errors %}
+				<br><br>
+				<div class="err_msg">{{error}}</div>
+				{% endfor %}
+
+				<input name="sortiphide" id="sortiphide" type="hidden" value="{{request.session.sortip}}"/>
+				<input name="sortinsnumhide" id="sortinsnumhide" type="hidden" value="{{request.session.sortinsnum}}"/>
+				<input name="sortcpuhide" id="sortcpuhide" type="hidden" value="{{request.session.sortcpu}}"/>
+				<input name="sortmemhide" id="sortmemhide" type="hidden" value="{{request.session.sortmem}}"/>
+				<input name="selected_node" id="selected_node" type="hidden" value="all"/>
+				<input name="resource_refresh" type="hidden" value="no"/>
+				<input id="statushide" type="hidden" value="{{request.session.filter_status}}" />
+
+				<div class="button_select_area">
+					<button type="button" onclick="refresh()" >データ更新</button></td>
+				</div>
+
+				{% for server in frontend_list %}
+                <h4>
+                	<img src="/static/images/node_mini.png" class="icons">
+                	&nbsp;フロントエンド : {{ server.hostname }} ： {{ server.server_ip }}
+                </h4>
+
+                <div class="instance_info_area">
+				<table class="instance_info" cellspacing="0" cellpadding="0">
+				<thead>
+					<tr>
+						<th>コンポーネント </th>
+						<th>区分 </th>
+						<th>状態 </th>
+						<th>モニタリング </th>
+					</tr>
+				</thead>
+				<tbody>
+				   {% for service in server.services %}
+				   <tr>
+					   <td>{{ service.service }}</td>
+					   <td>{{ service.partition }}</td>
+					   {% ifequal service.state "ENABLED" %}
+					   		<td width="100"><img class="icons" src="/static/images/stat_running.png"> {{ service.state }}</td>
+					   {% else %}
+						   {% ifequal service.state "DISABLED" %}
+						   		<td width="100"><img class="icons" src="/static/images/stat_stopping.png"> {{ service.state }}</td>
+						   {% else %}
+						   		<td width="100"><img class="icons" src="/static/images/stat_stopped.png"> {{ service.state }}</td>
+						   {% endifequal %}
+					   {% endifequal %}
+					   {% ifequal forloop.counter0 0 %}
+					   		<td rowspan="{{server.num_services}}" width="360">
+							<table class="monitoring" cellspacing="0" cellpadding="0">
+								<tr>
+									<td><img class="icons" src="/static/images/cpu_tin.png"></td>
+									<td>cpu使用率(%):</td>
+								    <td class="bar">{% if server.monitoring.isAvailable %}{{ server.monitoring.cpu_used }}{% else %}N/A{% endif %}
+								    <div class="progress_max" id="{{server.hostname}}_cpu"></div></td>
+								</tr>
+								<tr>
+									<td><img class="icons" src="/static/images/memory_tin.png"></td>
+									<td>メモリ使用量(GB):</td>
+								    <td class="bar">{% if server.monitoring.isAvailable %}{{ server.monitoring.mem_used }} / {{ server.monitoring.mem_total }}{% else %}N/A{% endif %}
+								    <div class="progress_max" id="{{server.hostname}}_mem"></div></td>
+								</tr>
+							    <tr>
+									<td><img class="icons" src="/static/images/storage_tin.png"></td>
+									<td>ディスク使用量/var(GB):</td>
+								    <td class="bar">{% if server.monitoring.isAvailable %}{{ server.monitoring.disk_var_used }} / {{ server.monitoring.disk_var_total }}{% else %}N/A{% endif %}
+								    <div class="progress_max" id="{{server.hostname}}_disk"></div></td>
+							    </tr>
+						   </table>
+					   		</td>
+					   {% endifequal %}
+				   </tr>
+				   {% endfor %}
+			   </tbody>
+			   </table>
+			   <div height="5">&nbsp;</div>
+			    {% if server.has_storage %}
+			   <table class="instance_info" cellspacing="5" cellpadding="5">
+			    {% if server.has_sc %}
+					<tr>
+					    <th width="150">EBSストレージ</th>
+					    <td>パス：{{server.volume_path}}{% ifnotequal server.volume_path server.volume_mount_path %}<br>(マウントポイント：{{ server.volume_mount_path }}){% endifnotequal %}</td>
+					    <td width="360"><table class="monitoring" cellspacing="0" cellpadding="0"><tr>
+							<td><img class="icons" src="/static/images/storage_tin.png"></td>
+							<td>EBS領域 使用量(GB):</td>
+						    <td class="bar">{% if server.monitoring.isAvailable %}{{ server.monitoring.disk_volume_used }} / {{ server.monitoring.disk_volume_total }}{% else %}N/A{% endif %}
+						    <div class="progress_max" id="{{server.hostname}}_volume"></div></td>
+						</tr></table></td>
+					</tr>
+			    {% endif %}
+			    {% if server.has_walrus %}
+					<tr>
+					    <th width="150">Walrusストレージ</th>
+					    <td>パス：{{server.walrus_path}}{% ifnotequal server.walrus_path server.walrus_mount_path %}<br>(マウントポイント：{{ server.walrus_mount_path }}){% endifnotequal %}</td>
+					    <td width="360"><table class="monitoring" cellspacing="0" cellpadding="0"><tr>
+							<td><img class="icons" src="/static/images/storage_tin.png"></td>
+							<td>Walrus領域 使用量(GB):</td>
+						    <td class="bar">{% if server.monitoring.isAvailable %}{{ server.monitoring.disk_walrus_used }} / {{ server.monitoring.disk_walrus_total }}{% else %}N/A{% endif %}
+						    <div class="progress_max" id="{{server.hostname}}_walrus"></div></td>
+						</tr></table></td>
+					</tr>
+			    {% endif %}
+			    </table>
+			   <div height="5">&nbsp;</div>
+			    {% endif %}
+			   </div>
+			   {% endfor %}
+
+                <h4>
+                	<img src="/static/images/node_mini.png" class="icons">
+                	<img src="/static/images/node_mini.png" class="icons">
+                	<img src="/static/images/node_mini.png" class="icons">
+                	&nbsp;ノードサーバ
+                </h4>
+
+                <div class="instance_info_area">
+				<table class="instance_info" cellspacing="0" cellpadding="0">
+				<thead>
+					<tr>
+						<th>IPアドレス <img class="sort" id="sip" src="/static/images/sort_default.png" onClick="sortIp();"/></th>
+						<th>仮想マシン数 <img class="sort" id="sinsnum" src="/static/images/sort_default.png" onClick="sortNumIns();"/></th>
+						<th>CPU割当<img class="sort" id="scpu" src="/static/images/sort_default.png"  onClick="sortCpu();"/></th>
+						<th>メモリ割当(MB)<img class="sort" id="smem" src="/static/images/sort_default.png"  onClick="sortMem();"/></th>
+						<th>モニタリング </th>
+					</tr>
+				</thead>
+				<tbody>
+				{% for entry in node_list %}
+
+				   <tr>
+					   <td class="link" onClick="selectNode('{{ entry.node_ip }}');"><img src="/static/images/node_tin.png" class="icons">
+					   &nbsp;&nbsp;&nbsp;{{ entry.hostname }}<p>({{ entry.node_ip }})</p></td>
+					   <td>{{ entry.num_instances }}</td>
+					   <td class="bar">{{ entry.cpu }} / {{ entry.max_cpu }}
+                       <div class="progress_max" id="node{{forloop.counter0}}cpu"></div></td>
+					   <td class="bar">{{ entry.mem }} / {{ entry.max_mem }}
+                       <div class="progress_max" id="node{{forloop.counter0}}mem"></div></td>
+			   		<td>
+					<table class="monitoring" cellspacing="0" cellpadding="0">
+						<tr>
+							<td><img class="icons" src="/static/images/cpu_tin.png"></td>
+							<td>cpu使用率(%):</td>
+						    <td class="bar">{% if entry.monitoring.isAvailable %}{{ entry.monitoring.cpu_used }}{% else %}N/A{% endif %}
+						    <div class="progress_max" id="{{entry.hostname}}_cpu"></div></td>
+						</tr>
+						<tr>
+							<td><img class="icons" src="/static/images/memory_tin.png"></td>
+							<td>メモリ使用量(GB):</td>
+						    <td class="bar">{% if entry.monitoring.isAvailable %}{{ entry.monitoring.mem_used }} / {{ entry.monitoring.mem_total }}{% else %}N/A{% endif %}
+						    <div class="progress_max" id="{{entry.hostname}}_mem"></div></td>
+						</tr>
+					    <tr>
+							<td><img class="icons" src="/static/images/storage_tin.png"></td>
+							<td>ディスク使用量/var(GB):</td>
+						    <td class="bar">{% if entry.monitoring.isAvailable %}{{ entry.monitoring.disk_var_used }} / {{ entry.monitoring.disk_var_total }}{% else %}N/A{% endif %}
+						    <div class="progress_max" id="{{entry.hostname}}_disk"></div></td>
+					    </tr>
+				   </table>
+			   		</td>
+				   </tr>
+
+			   {% endfor %}
+			   </tbody>
+			   </table>
+			</div>
+             </div><!--  right contents end -->
+
+            </div><!-- main contents (left, right) end -->
+{% endblock %}

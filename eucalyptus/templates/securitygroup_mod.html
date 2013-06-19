@@ -1,0 +1,263 @@
+{% extends "oss_base.html" %}
+
+{% comment %}
+# COPYRIGHT FUJITSU SOCIAL SCIENCE LABORATORY LIMITED 2012
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without modification,
+# are permitted provided that the following conditions are met:
+#
+# + Redistributions of source code must retain the above copyright notice, this list of conditions
+# and the following disclaimer.
+# + Redistributions in binary form must reproduce the above copyright notice, this list of conditions
+# and the following disclaimer in the documentation and/or other materials provided with the distribution.
+# + Neither the name of the FUJITSU SOCIAL SCIENCE LABORATORY LIMITED nor the names of its contributors
+# may be used to endorse or promote products derived from this software without specific prior written
+# permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+# IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+# FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+# CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+{% endcomment %}
+
+{% block title %}Cocuuma{% endblock title %}
+
+{% block link %}
+<link  href="/static/css/securitygroup_mod.css" rel="stylesheet" type="text/css" />
+{% endblock link %}
+
+{% block script %}
+<script src="/static/js/securitygroup_mod.js" type="text/javascript"></script>
+<script type="text/javascript">
+
+$(document).ready(function(){
+    changeType("{{form.addType.data}}");
+
+    //活性状態切替処理
+    $(".rule_radio").click(function(){
+        var radioVal = $(this).get(0).value;
+        changeType(radioVal);
+    });
+});
+
+function changeType(radioVal){
+    //活性状態切替処理
+    var $parentTable = $("table.add_rule");
+    var $outerInput = $parentTable.find(".outer");
+    var $innerInput = $parentTable.find(".inner");
+
+    //いったん活性状態にする
+    $parentTable.find(".outer_connect, .inner_connect").removeClass("volume_disable");
+    $outerInput.removeAttr("disabled");
+    $innerInput.removeAttr("disabled");
+    //非活性処理
+    switch(radioVal){
+        case"address":
+            $parentTable.find(".inner_connect").addClass("volume_disable");
+            $innerInput.attr("disabled","disabled");
+            break;
+        case"group":
+            $parentTable.find(".outer_connect").addClass("volume_disable");
+            $outerInput.attr("disabled","disabled");
+            break;
+    }
+}
+
+function selectprotocol(val){
+    if (val == "ssh") {
+      $('#id_{{ form.protocol.name }} option[value="tcp"]').attr({'selected':'selected'});
+      $('#id_{{ form.portMin.name }}').attr({'value':'22'});
+      $('#id_{{ form.portMax.name }}').attr({'value':'22'});
+    } else if (val == "rdp") {
+      $('#id_{{ form.protocol.name }} option[value="tcp"]').attr({'selected':'selected'});
+      $('#id_{{ form.portMin.name }}').attr({'value':'3389'});
+      $('#id_{{ form.portMax.name }}').attr({'value':'3389'});
+    } else if (val == "http") {
+      $('#id_{{ form.protocol.name }} option[value="tcp"]').attr({'selected':'selected'});
+      $('#id_{{ form.portMin.name }}').attr({'value':'80'});
+      $('#id_{{ form.portMax.name }}').attr({'value':'80'});
+    } else if (val == "https") {
+      $('#id_{{ form.protocol.name }} option[value="tcp"]').attr({'selected':'selected'});
+      $('#id_{{ form.portMin.name }}').attr({'value':'443'});
+      $('#id_{{ form.portMax.name }}').attr({'value':'443'});
+    } else if (val == "pop3") {
+      $('#id_{{ form.protocol.name }} option[value="tcp"]').attr({'selected':'selected'});
+      $('#id_{{ form.portMin.name }}').attr({'value':'110'});
+      $('#id_{{ form.portMax.name }}').attr({'value':'110'});
+    } else if (val == "imap") {
+      $('#id_{{ form.protocol.name }} option[value="tcp"]').attr({'selected':'selected'});
+      $('#id_{{ form.portMin.name }}').attr({'value':'143'});
+      $('#id_{{ form.portMax.name }}').attr({'value':'143'});
+    } else if (val == "pop3s") {
+      $('#id_{{ form.protocol.name }} option[value="tcp"]').attr({'selected':'selected'});
+      $('#id_{{ form.portMin.name }}').attr({'value':'995'});
+      $('#id_{{ form.portMax.name }}').attr({'value':'995'});
+    } else if (val == "imaps") {
+      $('#id_{{ form.protocol.name }} option[value="tcp"]').attr({'selected':'selected'});
+      $('#id_{{ form.portMin.name }}').attr({'value':'993'});
+      $('#id_{{ form.portMax.name }}').attr({'value':'993'});
+    } else if (val == "dns") {
+      $('#id_{{ form.protocol.name }} option[value="tcp"]').attr({'selected':'selected'});
+      $('#id_{{ form.portMin.name }}').attr({'value':'53'});
+      $('#id_{{ form.portMax.name }}').attr({'value':'53'});
+    } else if (val == "smtp") {
+      $('#id_{{ form.protocol.name }} option[value="tcp"]').attr({'selected':'selected'});
+      $('#id_{{ form.portMin.name }}').attr({'value':'25'});
+      $('#id_{{ form.portMax.name }}').attr({'value':'25'});
+    } else if (val == "smtps") {
+      $('#id_{{ form.protocol.name }} option[value="tcp"]').attr({'selected':'selected'});
+      $('#id_{{ form.portMin.name }}').attr({'value':'465'});
+      $('#id_{{ form.portMax.name }}').attr({'value':'465'});
+    } else if (val == "ldap") {
+      $('#id_{{ form.protocol.name }} option[value="tcp"]').attr({'selected':'selected'});
+      $('#id_{{ form.portMin.name }}').attr({'value':'389'});
+      $('#id_{{ form.portMax.name }}').attr({'value':'389'});
+    }
+}
+
+</script>
+{% endblock script %}
+
+{% block content %}
+            <!-- main contents (left, right) start -->
+            <div id="main_contents">
+
+                <!-- left contents start -->
+                <div id="left_contents">
+
+                </div><!-- left contents end -->
+
+                <!-- right contents start -->
+                <div id="right_contents">
+                    <div id="right_contents_header">
+                        <h2><img src="/static/images/firewall.png" class="icons">&nbsp;接続許可ルール変更</h2>
+                        <button id="reload_button" type="button" onclick="jump('/securitygroup/')">戻る</button>
+                    </div>
+					{% for error in errors %}
+					<div class="err_msg">{{error}}</div>
+					{% endfor %}
+					{% if request.session.ss_scr_modify %}
+					{% with request.session.ss_scr_modify as s %}
+                    <div class="firewall_info_area">
+                        <h4><img src="/static/images/firewall_mini.png" class="icons">&nbsp;{{ s.name }}</h4>
+                        <table class="firewall_info_header">
+                            <tr>
+                                <td class="index">所有者</td>
+                                <td>{{ s.owner_id }}</td>
+                                <td class="index">名前</td>
+                                <td>{{ s.name }}</td>
+                                <td class="index">説明</td>
+                                <td>{{ s.description }}</td>
+                            </tr>
+                        </table>
+                        <table class="firewall_info" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <th>操作</th>
+                                <th>プロトコル</th>
+                                <th>解放ポート範囲</th>
+                                <th>接続許可 ユーザ：ファイアウォール</th>
+                                <th>接続許可 アドレス範囲</th>
+                            </tr>
+						{% for rule in s.rules %}
+							<tr class="{% cycle 'odd' 'even' %}">
+								<td><button type="button" onclick="confirmJump('このプロトコルを削除しますか？', '/securitygroup/ruledel/{{forloop.counter0}}/')" >削除</button></td>
+								<td>{{ rule.ip_protocol }}</td>
+								<td>{{ rule.from_port }}&nbsp;&nbsp;～&nbsp;&nbsp;{{ rule.to_port }}</td>
+								<td>{% if rule.groupname %}{{ rule.groupname }}{% endif%}</td>
+								<td>{% if rule.cidr %}{{ rule.cidr }}{% endif%}</td>
+							</tr>
+						{% endfor %}
+                        </table>
+                    </div>
+                    <div class="firewall_info_area">
+                        <h4>接続許可ルールの追加</h4>
+                        <table class="firewall_info add_rule">
+
+                            <tr>
+                                <th><input type="radio" id="id_{{form.addType.name}}_0" name="{{form.addType.name}}" value="address" class="rule_radio" {% ifequal form.addType.data "address" %}checked="checked"{% endifequal %} />外部接続</th>
+                                <th><input type="radio" id="id_{{form.addType.name}}_1" name="{{form.addType.name}}" value="group" class="rule_radio" {% ifequal form.addType.data "group" %}checked="checked"{% endifequal %} />ファイアウォール間接続</th>
+                            </tr>
+                            <tr>
+                                <td class="outer_connect">
+                                    <fieldset>
+                                        <legend>プロトコル詳細</legend>
+										<select name="protocol_selector" id="id_protocol_selector" class="outer outer_connect" onchange="selectprotocol(this.options[this.selectedIndex].value)">
+											<option value=""></option>
+											<option value="ssh">SSH（TCP:22)</option>
+											<option value="rdp">RDP（TCP:3389）</option>
+											<option value="http">HTTP（TCP:80）</option>
+											<option value="https">HTTPS（TCP:443）</option>
+											<option value="pop3">POP3（TCP:110）</option>
+											<option value="imap">IMAP（TCP:143）</option>
+											<option value="pop3s">POP3S（TCP:995）</option>
+											<option value="imaps">IMAPS（TCP:993）</option>
+											<option value="dns">DNS（TCP:53）</option>
+											<option value="smtp">SMTP（TCP:25）</option>
+											<option value="smtps">SMTPS（TCP:465）</option>
+											<option value="ldap">LDAP（TCP:389）</option>
+										</select>
+                                        <table class="">
+                                            <tr>
+                                                <td class="index outer_connect">プロトコル<span class="asterisk">*</span></td>
+                                                <td>{{ form.protocol }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="index outer_connect">解放ポート範囲<span class="asterisk">*</span></td>
+                                                <td>{{ form.portMin }}&nbsp;&nbsp;～&nbsp;&nbsp;{{ form.portMax }}</td>
+                                            </tr>
+                                        </table>
+                                    </fieldset>
+                                    <fieldset>
+                                        <legend>接続許可アドレス範囲</legend>
+                                        <table>
+                                            <tr>
+                                                <td class="index outer_connect">接続許可アドレス範囲<span class="asterisk">*</span></td>
+                                                <td>{{ form.cidr }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2">
+                                                    <p>設定例：<br />
+                                                        192.168.10.100/32<br />
+                                                        → 192.168.10.100からの接続を許可<br />
+                                                        192.168.10.0/24<br />
+                                                        → 192.168.10.0 ~ 192.168.10.255
+                                                    </p>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </fieldset>
+                                </td>
+                                <td class="inner_connect">
+                                    <fieldset>
+                                        <legend>接続を許可するファイアウォール間接続</legend>
+                                        <table>
+                                            <tr>
+                                                <td class="index inner_connect">ユーザー<span class="asterisk">*</span></td>
+                                                <td>{{ form.fromUser }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="index inner_connect">ファイアウォール<span class="asterisk">*</span></td>
+                                                <td>{{ form.fromGroup }}</td>
+                                            </tr>
+                                        </table>
+                                    </fieldset>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2"><button type="button" onclick="jump('/securitygroup/ruleadd/')">追加</button></td>
+                            </tr>
+                        </table>
+						{% endwith %}
+						{% endif %}
+                    </div>
+
+                </div><!-- right contents end -->
+
+            </div><!-- main contents (left, right) end -->
+
+{% endblock content %}

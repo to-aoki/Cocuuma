@@ -1,0 +1,94 @@
+{% extends "oss_base.html" %}
+
+{% comment %}
+# COPYRIGHT FUJITSU SOCIAL SCIENCE LABORATORY LIMITED 2012
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without modification,
+# are permitted provided that the following conditions are met:
+#
+# + Redistributions of source code must retain the above copyright notice, this list of conditions
+# and the following disclaimer.
+# + Redistributions in binary form must reproduce the above copyright notice, this list of conditions
+# and the following disclaimer in the documentation and/or other materials provided with the distribution.
+# + Neither the name of the FUJITSU SOCIAL SCIENCE LABORATORY LIMITED nor the names of its contributors
+# may be used to endorse or promote products derived from this software without specific prior written
+# permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+# IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+# FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+# CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+{% endcomment %}
+
+{% block title %}Cocuuma{% endblock title %}
+
+{% block link %}
+<link  href="/static/css/address_list.css" rel="stylesheet" type="text/css" />
+{% endblock link %}
+
+{% block script %}
+<script src="/static/js/address_list.js" type="text/javascript"></script>
+{% endblock script %}
+
+{% block content %}
+            <!-- main contents (left, right) start -->
+            <div id="main_contents">
+
+                <!-- left contents start -->
+                <div id="left_contents">
+
+                </div><!-- left contents end -->
+
+                <!-- right contents start -->
+                <div id="right_contents">
+                    <div id="right_contents_header">
+                        <h2><img src="/static/images/elasticIP.png" class="icons">&nbsp;IPアドレス使用状況</h2>
+                        <button id="get_ip_button" type="button" onclick="jump('/address/allocate/')" >IPアドレスを取得</button>
+                        <button id="reload_button" type="button" onclick="jump('/address/')" >表示更新</button>
+                    </div>
+
+					{% for error in errors %}
+					<br><br>
+					<div class="err_msg">{{error}}</div>
+					{% endfor %}
+
+                    <div class="ipaddress_info_area">
+						<table class="ipaddress_info" cellpadding="0" cellspacing="0">
+							<thead>
+								<tr>
+									<th class="ipaddress_area">IPアドレス</th>
+									<th>ステータス</th>
+									<th>操作</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% spaceless %}
+								{% for a in request.session.ss_adr_addresslist %}
+								<tr class="{% cycle 'odd' 'even' %}">
+									<td class="ipaddress_area">{{a.ip}}</td>
+									<td>{{a.status}}</td>
+									<td  class="return_button_area">
+										<input type="button" value="返却" onclick="jump('/address/release/{{a.ip}}/')" {% if a.instance_id %}disabled{% endif %} />
+										{% if a.machine_id %}<input type="button" value="関連付け解除" onclick="jump('/address/disassociate/{{a.ip}}/')" />{% comment %}{% else %}<input type="button" value="仮想マシンへ関連付け" onclick="jump('/address/associate/{{a.ip}}/')" />{% endcomment %}{% endif %}
+									</td>
+								</tr>
+								{% endfor %}
+								{% endspaceless %}
+							</tbody>
+						</table>
+                        <p>
+                            仮想サーバへの関連付けは「仮想サーバ」メニューから行ってください。
+                        </p>
+                    </div>
+
+                </div><!-- right contents end -->
+
+            </div><!-- main contents (left, right) end -->
+
+{% endblock content %}

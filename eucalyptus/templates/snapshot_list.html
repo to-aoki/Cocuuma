@@ -1,0 +1,158 @@
+{% extends "oss_base.html" %}
+
+{% comment %}
+# COPYRIGHT FUJITSU SOCIAL SCIENCE LABORATORY LIMITED 2012
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without modification,
+# are permitted provided that the following conditions are met:
+#
+# + Redistributions of source code must retain the above copyright notice, this list of conditions
+# and the following disclaimer.
+# + Redistributions in binary form must reproduce the above copyright notice, this list of conditions
+# and the following disclaimer in the documentation and/or other materials provided with the distribution.
+# + Neither the name of the FUJITSU SOCIAL SCIENCE LABORATORY LIMITED nor the names of its contributors
+# may be used to endorse or promote products derived from this software without specific prior written
+# permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+# IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+# FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+# CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+{% endcomment %}
+
+{% block title %}Cocuuma{% endblock title %}
+
+{% block link %}
+	<link href="/static/css/snapshot_list.css" rel="stylesheet" type="text/css" />
+{% endblock link %}
+
+{% block script %}
+	<script src="/static/js/snapshot_list.js" type="text/javascript"></script>
+{% endblock script %}
+
+{% block content %}
+            <!-- main contents (left, right) start -->
+            <div id="main_contents">
+
+				<!-- left contents start -->
+				<div id="left_contents">
+					<ul class="nav">
+                    	<li onclick="jump('/volume/createform/')" class="cleate_volume_menu" id="create_new_volume">
+						    <table class="inner"><tr>
+						        <td><p>＋ボリューム</p><p>新規作成</p></td>
+						        <td><img src="/static/images/new_storage_mini.png"></td>
+						    </tr></table></li>
+                        </li>
+                        <li class="left_contents_index" >
+                            <div>データボリューム</div>
+                        </li>
+                         {% for vol in request.session.ss_vol_volumes %}
+
+							{% if vol == request.session.ss_vol_volumes_selected %}
+								<li class="left_contents_item selected_item" onclick="location.href='/volume/choice/{{forloop.counter0}}/'">
+							{% else %}
+								<li  class="left_contents_item" onclick="location.href='/volume/choice/{{forloop.counter0}}/'">
+							{% endif %}
+							    <table class="inner"><tr>
+							        <td>{{vol.db.name}}</td>
+							        <td>{% if vol.attached %}<img src="/static/images/attached_storage_tin.png">{% else %}<img src="/static/images/storage_tin.png">{% endif%}</td>
+							    </tr></table></li>
+
+						{% endfor %}
+
+                        <li class="left_contents_index" >
+                            <div>ルートデバイス</div>
+                        </li>
+                         {% for vol in request.session.ss_vol_root_devices %}
+
+							{% if vol == request.session.ss_vol_volumes_selected %}
+								<li class="left_contents_item selected_item" onclick="location.href='/volume/choiceroot/{{forloop.counter0}}/'">
+							{% else %}
+								<li  class="left_contents_item" onclick="location.href='/volume/choiceroot/{{forloop.counter0}}/'">
+							{% endif %}
+							    <table class="inner"><tr>
+							        <td>{{vol.db.name}}</td>
+							        <td>{% if vol.attached %}<img src="/static/images/attached_storage_tin.png">{% else %}<img src="/static/images/storage_tin.png">{% endif%}</td>
+							    </tr></table></li>
+
+						{% endfor %}
+
+                        <li class="left_contents_index">
+                            <div>バックアップファイル</div>
+                        </li>
+                        {% for snap in request.session.ss_vol_snapshots %}
+
+							{% if snap == request.session.ss_vol_snapshots_selected %}
+								<li class="left_contents_item selected_item" onclick="location.href='/volume/snapshot/{{forloop.counter0}}/'">
+							{% else %}
+								<li  class="left_contents_item" onclick="location.href='/volume/snapshot/{{forloop.counter0}}/'">
+							{% endif %}
+							    <table class="inner"><tr>
+							        <td>{{snap.id}}</td>
+							        <td>{% if not snap.image %}<img src="/static/images/snapshot_tin.png">{% else %}<img src="/static/images/image_snapshot_tin.png">{% endif %}</td>
+							    </tr></table></li>
+						{% endfor %}
+					</ul>
+				</div><!-- left contents end -->
+
+				<!-- ■画面タイトル[end] -->
+				{% for error in errors %}
+					<div class="err_msg">{{error}}</div>
+				{% endfor %}
+
+				{% if request.session.ss_vol_snapshots_selected %}
+						{% with request.session.ss_vol_snapshots_selected as snap %}
+                <!-- right contents start -->
+                <div id="right_contents">
+                    <div id="right_contents_header">
+                        <h2><img src="/static/images/snapshot.png" class="icons">&nbsp;バックアップファイル</h2>
+                        <input type="button" value="このバックアップからボリュームを作成する" onclick="jump('/volume/createformfromsnapshot/')" {% if snap.image %}disabled{% endif %}/>
+                        <input type="button" value="バックアップ削除"  onclick=" confirmJump('このバックアップファイルを削除しますか？','/volume/snapshot/delete/')" {% if snap.image %}disabled{% endif %}/>
+                        <input type="button" value="表示更新" onclick="jump('/volume/snapshot/refresh/')" id="reload_button"/>
+
+                    </div>
+                    <div class="backup_info_area">
+                        <table class="backup_info" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <td>スナップショットID</td>
+                                <td>{{ snap.id }}</td>
+                            </tr>
+                            <tr>
+                                <td>バックアップ元ボリュームID</td>
+                                <td>{{ snap.volume_id }}</td>
+                            </tr>
+                            <tr>
+                                <td>状態</td>
+                                <td>{{ snap.status }}</td>
+                            </tr>
+                            <tr>
+                                <td>作成日時</td>
+                                <td>{{ snap.start_time }}</td>
+                            </tr>
+                            <tr>
+                                <td>進行状況</td>
+                                <td>{{ snap.progress }}</td>
+                            </tr>
+                            <tr>
+                                <td>イメージID</td>
+                                <td>{{ snap.image }}</td>
+                            </tr>
+                        </table>
+
+							{% ifequal snap.status "pending" %}バックアップファイルは作成途中です。状態が「completed」になるまでお待ちください。{% endifequal %}
+						{% endwith %}
+				{% endif %}
+
+                    </div>
+                </div><!-- right contents end -->
+
+
+
+            </div><!-- main contents (left, right) end -->
+
+{% endblock content %}

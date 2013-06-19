@@ -1,0 +1,174 @@
+{% extends "oss_base.html" %}
+
+{% comment %}
+# COPYRIGHT FUJITSU SOCIAL SCIENCE LABORATORY LIMITED 2012
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without modification,
+# are permitted provided that the following conditions are met:
+#
+# + Redistributions of source code must retain the above copyright notice, this list of conditions
+# and the following disclaimer.
+# + Redistributions in binary form must reproduce the above copyright notice, this list of conditions
+# and the following disclaimer in the documentation and/or other materials provided with the distribution.
+# + Neither the name of the FUJITSU SOCIAL SCIENCE LABORATORY LIMITED nor the names of its contributors
+# may be used to endorse or promote products derived from this software without specific prior written
+# permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+# IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+# FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+# CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+{% endcomment %}
+
+{% block title %}Cocuuma{% endblock title %}
+
+{% block link %}
+<link href="/static/css/machine_group_create_3.css" rel="stylesheet" type="text/css" />
+{% endblock link %}
+
+{% block script %}
+<script src="/static/js/machine_group_create_3.js" type="text/javascript"></script>
+{% endblock script %}
+
+{% block content %}
+            <!-- main contents (left, right) start -->
+            <div id="main_contents">
+
+                <!-- left contents start -->
+                <div id="left_contents">
+
+                </div><!-- left contents end -->
+
+                <!-- right contents start -->
+                <div id="right_contents">
+                    <div id="right_contents_header">
+						<h2><img src="/static/images/new_machine.png" class="icons">&nbsp;仮想サーバグループ{% if request.session.ss_mch_editData.group_id %}編集{% else %}作成{% endif %}</h2>
+                        <div >
+                            <table class="progress_tracker">
+                                <tr>
+                                    <td id="first_column" class="past_column">1. テンプレート選択</td>
+                                    <td>&gt;</td>
+                                    <td id="second_column" class="past_column">2. 仮想サーバ設定</td>
+                                    <td>&gt;</td>
+                                    <td id="third_column" class="current_column">3. 構成確認</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+
+				{% for error in errors %}
+					<div class="err_msg">{{error}}</div>
+				{% endfor %}
+
+                    <div class="vmachine_info_area">
+                        <h2 class="index"><img src="/static/images/machines_mini.png" class="icons">&nbsp;起動構成</h2>
+                        <table class="vmachine_info" id="group_info" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <td>仮想サーバグループ名</td>
+                                <td class="icon">&nbsp;</td>
+                                <td>{{request.session.ss_mch_editData.name}}</td>
+                            </tr>
+                            <tr>
+                                <td>説明</td>
+                                <td class="icon">&nbsp;</td>
+                                <td>{{request.session.ss_mch_editData.description}}</td>
+                            </tr>
+                            <tr>
+                                <td>テンプレート名</td>
+                                <td class="icon">&nbsp;</td>
+								{% spaceless %}
+								<td>
+									{% for t in request.session.ss_mch_editData.template_list %}
+										{{t.template_name}}
+										{% if not forloop.last %}<br/>{% endif %}
+									{% endfor %}
+								</td>
+								{% endspaceless %}
+                            </tr>
+                            <tr>
+                                <td>起動台数</td>
+                                <td class="icon">&nbsp;</td>
+                                <td>{{request.session.ss_mch_editData.machine_list|length}}</td>
+                            </tr>
+                        </table>
+                    </div>
+				{% for m in request.session.ss_mch_editData.machine_list %}
+                    <div class="vmachine_info_area">
+                        <h3 class="index"><img src="/static/images/new_machine_mini.png" class="icons">&nbsp;{{m.name}}</h3>
+                        <table class="vmachine_info" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <td>サーバ名</td>
+                                <td class="icon">&nbsp;</td>
+                                <td>{{m.name}}</td>
+                            </tr>
+                            <tr>
+                                <td>IPアドレス</td>
+                                <td class="icon"><img src="/static/images/elasticIP_tin.png"></td>
+							{% if m.ip %}
+								<td>{{m.ip}}</td>
+							{% else %}
+								<td>{{"指定しない"}}</td>
+							{% endif %}
+                            </tr>
+                            <tr>
+                                <td>起動タイプ</td>
+                                <td class="icon"><img src="/static/images/cpu_tin.png"><img src="/static/images/memory_tin.png"></td>
+                                <td>{{m.vmtype_disp}}</td>
+                            </tr>
+                            <tr>
+                                <td>データボリューム</td>
+                                <td class="icon"><img src="/static/images/storage_tin.png"></td>
+							{% if m.volume %}
+								<td>{{m.volume_disp}}</td>
+							{% else %}
+								<td>{{"使用しない"}}</td>
+							{% endif %}
+                            </tr>
+                            <tr class="detail">
+                                <td>仮想サーバ接続鍵</td>
+                                <td class="icon"><img src="/static/images/keyPair_tin.png"></td>
+                                <td>{{m.keypair}}</td>
+                            </tr>
+                            <tr class="detail">
+                                <td>ファイアウォール</td>
+                                <td class="icon"><img src="/static/images/firewall_tin.png"></td>
+                                <td>{{m.security_group}}</td>
+                            </tr>
+                            <tr class="detail">
+                                <td>Availability Zone</td>
+                                <td class="icon">&nbsp;</td>
+							{% if m.avaulability_zone %}
+								<td>{{m.avaulability_zone}}</td>
+							{% else %}
+								<td>{{"指定しない"}}</td>
+							{% endif %}
+                            </tr>
+                            <tr class="detail">
+                                <td>ユーザーデータ</td>
+                                <td class="icon">&nbsp;</td>
+                                <td>{{m.user_data}}</td>
+                            </tr>
+                            <tr>
+                                <td class="table_button"><button type="button" onclick="switchDisplay($(this))">↓詳細表示</button></td>
+                                <td class="icon">&nbsp;</td>
+                                <td class="table_button_right"></td>
+                            </tr>
+                        </table>
+                    </div>
+				{% endfor %}
+                    <div id="bottom_buttons">
+                        <button type="button" onclick="jump('/machine/step2back/')">&lt;&nbsp;戻る</button>
+                        <button type="button" onclick="jump('/machine/step3save/')">保存のみ</button>
+                        <button type="button" onclick="jump('/machine/step3run/')">保存して起動</button>
+                        <button type="button" onclick="jump('/machine/cancel/')">キャンセル</button>
+                    </div>
+                </div><!-- right contents end -->
+
+            </div><!-- main contents (left, right) end -->
+
+{% endblock content %}

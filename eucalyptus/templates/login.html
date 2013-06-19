@@ -1,0 +1,77 @@
+<!--
+# COPYRIGHT FUJITSU SOCIAL SCIENCE LABORATORY LIMITED 2012
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without modification,
+# are permitted provided that the following conditions are met:
+#
+# + Redistributions of source code must retain the above copyright notice, this list of conditions
+# and the following disclaimer.
+# + Redistributions in binary form must reproduce the above copyright notice, this list of conditions
+# and the following disclaimer in the documentation and/or other materials provided with the distribution.
+# + Neither the name of the FUJITSU SOCIAL SCIENCE LABORATORY LIMITED nor the names of its contributors
+# may be used to endorse or promote products derived from this software without specific prior written
+# permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+# IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+# FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+# CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cocuuma</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="copyright" content="COPYRIGHT FUJITSU SOCIAL SCIENCE LABORATORY LIMITED 2012">
+    <link  href="/static/css/reset.css" rel="stylesheet" type="text/css" />
+    <link  href="/static/css/login.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+    <!-- login container start -->
+    <div id="login_container">
+        <div id="logo">
+            <img alt="#" title="Koala" src="/static/images/koala_128.png">
+            <span id="site_name">Cocuuma</span>
+        </div>
+        <p>{{message}}</p>
+        <form action="/login/dologin/" method="post">{% csrf_token %}
+            <div id="input_area">
+                <table>
+                    <tr>
+                        <td class="input_label">アカウントID</td>
+                        <td>：</td>
+						<td>{{ form.account_id }}</td>
+                    </tr>
+                    <tr>
+                        <td>ユーザーID</td>
+                        <td>：</td>
+                        <!--<td><input class="input_text" type="text" title="ユーザーIDを入力してください" /></td>-->
+						<td>{{ form.user_id }}</td>
+                    </tr>
+                    <tr>
+                        <td>パスワード</td>
+                        <td>：</td>
+                        <!--<td><input class="input_text" type="password" title="パスワードを入力してください" /></td>-->
+						<td>{{ form.user_password }}</td>
+                    </tr>
+                </table>
+			</div>
+			<input id="login_button" type="submit" value="ログイン" />
+		</form>
+
+		<!-- footer start -->
+        <div id="footer">
+            <span>Copyright 2012
+                <a href="http://www.ssl.fujitsu.com/">FUJITSU SOCIAL SCIENCE LABORATORY LIMITED</a>
+            </span>
+        </div><!-- footer end -->
+
+    </div><!-- login container end -->
+</body>
+</html>

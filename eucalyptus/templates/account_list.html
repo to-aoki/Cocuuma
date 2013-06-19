@@ -1,0 +1,104 @@
+{% extends "oss_base.html" %}
+
+{% comment %}
+# COPYRIGHT FUJITSU SOCIAL SCIENCE LABORATORY LIMITED 2012
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without modification,
+# are permitted provided that the following conditions are met:
+#
+# + Redistributions of source code must retain the above copyright notice, this list of conditions
+# and the following disclaimer.
+# + Redistributions in binary form must reproduce the above copyright notice, this list of conditions
+# and the following disclaimer in the documentation and/or other materials provided with the distribution.
+# + Neither the name of the FUJITSU SOCIAL SCIENCE LABORATORY LIMITED nor the names of its contributors
+# may be used to endorse or promote products derived from this software without specific prior written
+# permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+# IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+# FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+# CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+{% endcomment %}
+
+{% block title %}Cocuuma{% endblock title %}
+
+{% block link %}
+	<link rel="stylesheet" href="/static/css/resource.css" />
+{% endblock %}
+
+{% block script %}
+	<script type="text/javascript" src="/static/js/account_list.js"></script>
+{% endblock %}
+
+{% block content %}
+        <!-- main contents (left, right) start -->
+        <div id="main_contents">
+
+            <!-- left contents start -->
+            <div id="left_contents">
+
+            </div><!-- left contents end -->
+
+            <!-- right contents start -->
+            <div id="right_contents">
+                <div id="right_contents_header">
+                    <h2><img src="/static/images/account.png" class="icons">&nbsp;アカウント情報</h2>
+                </div>
+
+				{% for error in errors %}
+				<br><br>
+				<div class="err_msg">{{error}}</div>
+				{% endfor %}
+
+				<input name="sortnamehide" id="sortnamehide" type="hidden" value="{{request.session.sortname}}"/>
+				<input name="sortcpuhide" id="sortcpuhide" type="hidden" value="{{request.session.sortcpu}}"/>
+				<input name="sortmemhide" id="sortmemhide" type="hidden" value="{{request.session.sortmem}}"/>
+				<input name="sortvolhide" id="sortvolhide" type="hidden" value="{{request.session.sortvol}}"/>
+				<input name="selected_account" id="selected_account" type="hidden" value="all"/>
+				<input name="resource_refresh" type="hidden" value="no"/>
+				<input id="statushide" type="hidden" value="{{filter_status}}" />
+
+				<div class="button_select_area">
+					<button type="button" onclick="refresh()" >データ更新</button></td>
+				</div>
+                <h4>
+                	<img src="/static/images/dashboard_mini.png" class="icons">
+                	&nbsp;全アカウント情報
+                </h4>
+
+                <div class="instance_info_area">
+				<table class="instance_info" cellspacing="0" cellpadding="0">
+				<thead>
+					<tr>
+						<th>アカウント名 <img class="sort" id="saccountname" src="/static/images/sort_default.png" onClick="sortName();"/></th>
+						<th>仮想マシン数 (停止中も含む)</th>
+						<th>使用CPU(コア)<img class="sort" id="scpu" src="/static/images/sort_default.png"  onClick="sortCpu();"/></th>
+						<th>使用メモリ(MB)<img class="sort" id="smem" src="/static/images/sort_default.png"  onClick="sortMem();"/></th>
+						<th>EBS総量(GB)<img class="sort" id="stotalvol" src="/static/images/sort_default.png"  onClick="sortVol();"/></th>
+					</tr>
+				</thead>
+				<tbody>
+				{% for entry in account_list %}
+
+				   <tr>
+					   <td class="link" onClick="selectAccount('{{ entry.accountname }}');">{{ entry.accountname }}</td>
+					   <td>{{ entry.num_instances }} ( {{ entry.num_all_instances }} )</td>
+					   <td>{{ entry.cpu }}</td>
+					   <td>{{ entry.mem }}</td>
+					   <td>{{ entry.total_volume_size }}</td>
+				   </tr>
+
+			   {% endfor %}
+			   </tbody>
+			   </table>
+			</div>
+             </div><!--  right contents end -->
+
+            </div><!-- main contents (left, right) end -->
+{% endblock %}

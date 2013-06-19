@@ -1,0 +1,124 @@
+{% extends "oss_base.html" %}
+
+{% comment %}
+# COPYRIGHT FUJITSU SOCIAL SCIENCE LABORATORY LIMITED 2012
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without modification,
+# are permitted provided that the following conditions are met:
+#
+# + Redistributions of source code must retain the above copyright notice, this list of conditions
+# and the following disclaimer.
+# + Redistributions in binary form must reproduce the above copyright notice, this list of conditions
+# and the following disclaimer in the documentation and/or other materials provided with the distribution.
+# + Neither the name of the FUJITSU SOCIAL SCIENCE LABORATORY LIMITED nor the names of its contributors
+# may be used to endorse or promote products derived from this software without specific prior written
+# permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+# IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+# FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+# CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+{% endcomment %}
+
+{% block title %}Cocuuma{% endblock title %}
+
+{% block link %}
+	<link href="/static/css/attach_volume.css" rel="stylesheet" type="text/css" />
+{% endblock link %}
+
+{% block script %}
+	<script src="/static/js/attach_volume.js" type="text/javascript"></script>
+{% endblock script %}
+
+{% block content %}
+            <!-- main contents (left, right) start -->
+            <div id="main_contents">
+
+                <!-- left contents start -->
+                <div id="left_contents">
+                     <ul class="nav">
+                    	<li onclick="jump('/volume/createform/')" class="cleate_volume_menu" id="create_new_volume">
+						    <table class="inner"><tr>
+						        <td><p>＋ボリューム</p><p>新規作成</p></td>
+						        <td><img src="/static/images/new_storage_mini.png"></td>
+						    </tr></table></li>
+                        </li>
+                        <li class="left_contents_index" >
+                            <div>データボリューム</div>
+                        </li>
+                         {% for vol in request.session.ss_vol_volumes %}
+
+							{% if vol == request.session.ss_vol_volumes_selected %}
+								<li class="left_contents_item selected_item" onclick="location.href='/volume/choice/{{forloop.counter0}}/'">
+							{% else %}
+								<li  class="left_contents_item" onclick="location.href='/volume/choice/{{forloop.counter0}}/'">
+							{% endif %}
+							    <table class="inner"><tr>
+							        <td>{{vol.db.name}}</td>
+							        <td><img src="/static/images/storage_tin.png"></td>
+							    </tr></table></li>
+
+						{% endfor %}
+
+                        <li class="left_contents_index">
+                            <div>バックアップファイル</div>
+                        </li>
+                        {% for snap in request.session.ss_vol_snapshots %}
+
+							{% if snap == request.session.ss_vol_snapshots_selected %}
+								<li class="left_contents_item selected_item" onclick="location.href='/volume/snapshot/{{forloop.counter0}}/'">
+							{% else %}
+								<li  class="left_contents_item" onclick="location.href='/volume/snapshot/{{forloop.counter0}}/'">
+							{% endif %}
+							    <table class="inner"><tr>
+							        <td>{{snap.id}}</td>
+							        <td><img src="/static/images/snapshot_tin.png"></td>
+							    </tr></table></li>
+						{% endfor %}
+                    </ul>
+                </div><!-- left contents end -->
+
+                <!-- right contents start -->
+                <div id="right_contents">
+                    <div id="right_contents_header">
+                        <h2><img src="/static/images/storage.png" class="icons"><b>></b><img src="/static/images/virtual_machine.png" class="icons">&nbsp;仮想マシンへデータボリューム取り付け</h2>
+                    </div>
+                    <!-- formはkoala_base.htmlに統合する-->
+                    <form action="" method="">
+                        <div class="attach_info_area">
+                            <table class="attach_info" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td>仮想マシン<span class="asterisk">*</span></td>
+                                    <td>{{ form.machine }}</td>
+                                </tr>
+                                <tr>
+                                    <td>デバイス名<span class="asterisk">*</span></td>
+                                    <td>{{ form.device }}</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2">
+                                        <!--紙芝居用button-->
+                                        <span id="bottom_buttons">
+                                            <input onclick="jump('/volume/attach/')" type="button"  value="取り付け"/>
+                                            <input onclick="jump('/volume/cancel/')"  type="button"  value="キャンセル"/>
+                                        </span>
+                                    </td>
+                                </tr>
+                            </table>
+                            <p>
+                                デバイス名は「/dev/vdb」~「dev/vdz」(/dev/vd[b-z])を指定してください。
+                            </p>
+                        </div>
+                    </form>
+
+                </div><!-- right contents end -->
+
+            </div><!-- main contents (left, right) end -->
+
+{% endblock content %}

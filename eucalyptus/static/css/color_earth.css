@@ -1,0 +1,86 @@
+/*
+#
+# COPYRIGHT FUJITSU SOCIAL SCIENCE LABORATORY LIMITED 2012
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without modification,
+# are permitted provided that the following conditions are met:
+#
+# + Redistributions of source code must retain the above copyright notice, this list of conditions
+# and the following disclaimer.
+# + Redistributions in binary form must reproduce the above copyright notice, this list of conditions
+# and the following disclaimer in the documentation and/or other materials provided with the distribution.
+# + Neither the name of the FUJITSU SOCIAL SCIENCE LABORATORY LIMITED nor the names of its contributors
+# may be used to endorse or promote products derived from this software without specific prior written
+# permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+# IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+# FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+# CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+*/
+
+html{
+    background: url(../images/koala_bg.png) repeat;
+}
+
+/* header */
+#header {
+    background:url(../images/earth_wave.gif) repeat-x;
+}
+
+.unselected_group,
+#create_new_volume,
+#left_contents li.left_contents_item,
+#left_contents li.left_contents_index,
+#left_contents #create_new_template,
+#left_contents #create_new_group,
+#menu ul.nav li.menu_list,
+#menu ul.nav  li.unselected,
+#menu ul.button li.create_list {
+    background: url(../images/grey_bar_hi.gif) repeat-x bottom;
+    }
+    
+.selected_item,
+.selected_group,
+.selected_template,
+#left_contents li.selected_item,
+#left_contents #create_new_volume:hover,
+#left_contents #create_new_group:hover,
+#create_new_image:hover,
+#left_contents li.left_contents_item:hover,
+#left_contents li.left_contents_index:hover,
+#left_contents #create_new_template:hover,
+#left_contents li.selected_template,
+#left_contents li.selected_group,
+#menu ul.nav li.menu_list:hover,
+#menu ul.nav  li.selected,
+#menu ul.button li.create_list:hover {
+    background: url(../images/earth_menu_hi.gif) repeat-x bottom;
+    }
+
+#left_contents li.left_contents_machine,
+#left_contents li.left_contents_machine:hover {
+    background: #b4cf95;
+}
+    
+.current_column{
+    background-color: #b4cf95;
+}
+    
+h2{
+    border-left: 3px #88aa88 solid;
+    border-bottom: 3px #88aa88 solid;
+}
+h3{
+    border-left: 3px #88aa88 solid;
+}
+h4{
+    border-left: 3px silver solid;
+}
+

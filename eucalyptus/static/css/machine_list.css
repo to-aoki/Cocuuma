@@ -1,0 +1,224 @@
+/*
+#
+# COPYRIGHT FUJITSU SOCIAL SCIENCE LABORATORY LIMITED 2012
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without modification,
+# are permitted provided that the following conditions are met:
+#
+# + Redistributions of source code must retain the above copyright notice, this list of conditions
+# and the following disclaimer.
+# + Redistributions in binary form must reproduce the above copyright notice, this list of conditions
+# and the following disclaimer in the documentation and/or other materials provided with the distribution.
+# + Neither the name of the FUJITSU SOCIAL SCIENCE LABORATORY LIMITED nor the names of its contributors
+# may be used to endorse or promote products derived from this software without specific prior written
+# permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+# IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+# FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+# CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+*/
+
+#left_contents ul.nav {
+    margin:0 0 11px 5px;
+    border-top:1px solid #666666;
+    border-right:1px solid #666666;
+    border-bottom:1px solid #666666;
+    border-left:1px solid #666666;
+    list-style:none;
+    padding:0;
+    }
+
+#left_contents #create_new_group{
+    padding:10px 4px;
+    margin:0 0 0 0;
+    border-bottom: 1px #aaaaaa solid;
+}
+#left_contents #create_new_group:hover {
+    cursor: pointer;
+}
+
+#left_contents li.left_contents_item {
+    padding:4px 4px 6px 10px;
+    border-bottom: 1px #aaaaaa solid;
+//    background: #8fccd0;
+    }
+#left_contents li.left_contents_index div{
+    margin:0 0 0 20px;
+}
+
+#left_contents li.left_contents_item div{
+    margin:0 0 0 20px;
+}
+#left_contents li.left_contents_index img,
+#left_contents li.left_contents_item img{
+    float:left;
+    line-height: 100%;
+}
+#left_contents li.left_contents_index img{
+    margin:0 0 0 3px;
+}
+#left_contents li.left_contents_item img{
+    margin:0 0 0 3px;
+}
+#create_new_group:hover,
+#left_contents li.left_contents_index:hover {
+    cursor: pointer;
+    }
+#left_contents .create_template_menu p{
+    font-weight:bold;
+
+    margin: 0 0 0 0;
+    }
+
+/*left_contentsのグループ見出し*/
+#left_contents li.left_contents_index{
+    padding:4px 4px 6px 0;
+}
+
+//#left_contents li.left_contents_item:hover{
+//    background: #8fccd0;
+//}
+
+#left_contents li.left_contents_category{
+    background:#D3D3D3;
+    padding:4px 4px 6px 5px;
+    border-bottom: 1px #aaaaaa solid;
+}
+
+#left_contents li.left_contents_category:hover{
+    cursor: default;
+}
+
+#left_contents li.out_of_manage{
+    background: none repeat scroll 0 0 #ECEFE7 !important;
+    border-bottom: 1px solid #aaaaaa;
+    padding: 4px 4px 6px 10px;
+}
+
+#left_contents li.out_of_manage:hover{
+    cursor: default;
+}
+
+#left_contents table.inner {
+    width:180px;
+}
+#left_contents table.inner tr td:last-child {
+    width:50px;
+}
+
+/* template_info */
+div.vmachine_info_area {
+	display:inline-block;
+	width: 670px;
+	}
+
+div.vmachine_info_area p {
+    text-align:left;
+    font-size: 19px;
+}
+table.icon_table {
+    width: 100%;
+}
+table.icon_table td {
+    width:120px;
+}
+
+table.vmachine_info {
+    width: 100%;
+	padding: 0;
+	margin: 0;
+    border-collapse:collapse;
+	}
+
+table.vmachine_info tr:nth-child(even) {
+    background-color: #f4f4f4;
+    }
+table.vmachine_info td{
+    border: 1px solid #9097A9;
+    }
+
+table.vmachine_info td {
+    padding: 3px 5px;
+    text-align: left;
+	}
+
+table.vmachine_info tr td:first-child {
+    width:120px;
+    border-right:none;
+}
+table.vmachine_info td.icon {
+    width:30px;
+    border-left:none;
+}
+#modify_button{
+    float: right;
+    display:inline-block;
+    width:200px;
+}
+
+.detail{
+    display: none;
+}
+.table_button{
+    border-right: none !important;
+}
+.table_button_right{
+    border-left: none !important;
+}
+
+#refresh_button{
+    float: right;
+}
+
+/* monitorings */
+
+.ui-progressbar-value {
+    margin:0 !important;
+    background-image: url("../images/pbar-ani.gif");
+}
+.progress_max{
+    border: 1px solid #9097A9;
+}
+.graph{
+    width: 240px;
+}
+table.monitoring {
+    padding:0;
+    margin:0;
+    border-collapse:collapse;
+    width: 450px;
+}
+table.monitoring td {
+	border-style: hidden;
+}
+table.monitoring td.bar {
+	width: 100px;
+	text-align: right;
+}
+table.monitoring td.icon {
+	width:30px;
+}
+table.monitoring tr td:first-child {
+    width:30px;
+}
+table.monitoring tr.even{
+    background-color: #ffffff;
+}
+
+table.state_info {
+    padding:0;
+    margin:0;
+    border-collapse:collapse;
+    width: 450px;
+}
+table.state_info td {
+	border-style: hidden;
+    background-color: #ffffff;
+}

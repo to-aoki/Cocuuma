@@ -1,0 +1,133 @@
+{% extends "oss_base.html" %}
+
+{% comment %}
+# COPYRIGHT FUJITSU SOCIAL SCIENCE LABORATORY LIMITED 2012
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without modification,
+# are permitted provided that the following conditions are met:
+#
+# + Redistributions of source code must retain the above copyright notice, this list of conditions
+# and the following disclaimer.
+# + Redistributions in binary form must reproduce the above copyright notice, this list of conditions
+# and the following disclaimer in the documentation and/or other materials provided with the distribution.
+# + Neither the name of the FUJITSU SOCIAL SCIENCE LABORATORY LIMITED nor the names of its contributors
+# may be used to endorse or promote products derived from this software without specific prior written
+# permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+# IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+# FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+# CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+{% endcomment %}
+
+{% block title %}Cocuuma{% endblock title %}
+
+{% block link %}
+	<link href="/static/css/image_list.css" rel="stylesheet" type="text/css" />
+{% endblock link %}
+
+{% block script %}
+	<script src="/static/js/image_list.js" type="text/javascript"></script>
+{% endblock script %}
+
+{% block content %}
+			<!-- main contents (left, right) start -->
+			<div id="main_contents">
+
+			<!-- left contents start -->
+				<div id="left_contents">
+					<ul class="nav">
+                    <!--
+                    	{% if request.session.ss_usr_user.admin %}
+                        <li onclick="jump('/image/createstep1/')" class="cleate_image_menu" id="create_new_image">
+                            <p>+OSイメージ新規作成</p>
+                        </li>
+                        {% endif %}
+                    -->
+                        <li class="left_contents_index" >
+                            <div class="">システムOSイメージ</div>
+                        </li>
+                        {% for i in image_model_List %}
+							{% if i.is_public == 'public' %}
+								{% if forloop.counter0 == request.session.ss_img_selectNumber %}
+									<li class="left_contents_item selected" onclick="location.href='/image/{{i.id}}/'">
+								{% else %}
+									<li  class="left_contents_item" onclick="location.href='/image/{{i.id}}/'">
+								{% endif %}
+								    <table class="inner"><tr>
+								        <td>{{i.name}}</td>
+								        <td><img src="/static/images/OSImage_tin.png"></td>
+								    </tr></table></li>
+							{% endif %}
+						{% endfor %}
+                        <li class="left_contents_index">
+                            <div class="">マイOSイメージ</div>
+                        </li>
+                        {% for i in image_model_List %}
+							{% if i.is_public != 'public' %}
+								{% if forloop.counter0 == request.session.ss_img_selectNumber %}
+									<li class="left_contents_item selected" onclick="location.href='/image/{{i.id}}/'">
+								{% else %}
+									<li class="left_contents_item" onclick="location.href='/image/{{i.id}}/'">
+								{% endif %}
+								    <table class="inner"><tr>
+								        <td>{{i.name}}</td>
+								        <td><img src="/static/images/OSImage_tin.png"></td>
+								    </tr></table></li>
+							{% endif %}
+						{% endfor %}
+                    </ul>
+				</div><!-- left contents end -->
+
+                <!-- right contents start -->
+
+				<div id="right_contents">
+					<div id="right_contents_header">
+						<h2><img src="/static/images/OSImage.png" class="icons">&nbsp;OSイメージの公開範囲変更</h2>
+					</div>
+					<!-- エラーメッセージなど -->
+					{% if message %}
+					<br>
+					{% for m in message %}
+					<div class="err_msg">{{m}}</div>
+					{% endfor %}
+					<br>
+					{% endif %}
+
+					<div class="image_info_area">
+
+                       <table class="image_info" cellpadding="0" cellspacing="0">
+							{% spaceless %}
+							{% for key, value in request.session.ss_img_publicrange %}
+							<tr>
+								<td class="radio_column">
+									<input type="radio" id="id_{{form.publicrange.name}}_{{forloop.counter0}}" name="{{form.publicrange.name}}" value="{{key}}" {% ifequal key form.publicrange.value %}checked="checked"{% endifequal %}/>
+								</td>
+								<td>{{value}}</td>
+							</tr>
+							{% endfor %}
+							{% endspaceless %}
+							<tr>
+								<td colspan="2">
+									<span id="bottom_buttons">
+										{% for i in image_model_List %}
+											{% if forloop.counter0 == request.session.ss_img_selectNumber %}
+													<input type="button" onclick="jump('/image/domodpublicrange/')" value="設定"/>
+													<input type="button" onclick="location.href='/image/{{i.id}}/'" value="キャンセル"/>
+											{% endif %}
+										{% endfor %}
+									</span>
+								</td>
+							</tr>
+						</table>
+
+					</div>
+				</div><!-- right contents end -->
+
+			</div><!-- main contents (left, right) end -->
+{% endblock content %}

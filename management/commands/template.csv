@@ -1,0 +1,21 @@
+# テンプレート定義
+# マニフェスト名,テンプレート名,説明,VMType,個数
+00base.kc6.0.1/00Base.KC6.0.1.img.manifest.xml,Baseテンプレート,Cent6.0/1台起動,m1.small,1
+01webtypea.kc6.0.1/01WebTypeA.KC6.0.1.img.manifest.xml,WebTypeAテンプレート,Cent6.0+Apache+PHP+PostgreSQL/2台起動,m1.small,2
+02webtypeb.kc6.0.1/02WebTypeB.KC6.0.1.img.manifest.xml,WebTypeBテンプレート,Cent6.0+Apache+PHP+MySQL/2台起動,m1.small,2
+03webtypec.kc6.0.1/03WebTypeC.KC6.0.1.img.manifest.xml,WebTypeCテンプレート,Cent6.0+Apache+Tomcat(Java+Struts)+PostgreSQL/3台起動,m1.small,3
+04webtyped.kc6.0.1/04WebTypeD.KC6.0.1.img.manifest.xml,WebTypeDテンプレート,Cent6.0+Apache+Tomcat(Java+Struts)+MySQL/3台起動,m1.small,3
+05webtypee.kc6.0.1/05WebTypeE.KC6.0.1.img.manifest.xml,WebTypeEテンプレート,Cent6.0+Apache+Ruby(Ruby on rails)+PostgreSQL/3台起動,m1.small,3
+06webtypef.kc6.0.1/06WebTypeF.KC6.0.1.img.manifest.xml,WebTypeFテンプレート,Cent6.0+Apache+Ruby(Ruby on rails)+MySQL/3台起動,m1.small,3
+07mail.kc6.0.1/07Mail.KC6.0.1.img.manifest.xml,メールテンプレート,Cent6.0+Postfix+Dovecot/1台起動,m1.small,1
+08webmail.kc6.0.1/08WebMail.KC6.0.1.img.manifest.xml,Webメールテンプレート,Cent6.0+SquirrelMail+PHP+PostgreSQL/1台起動,m1.small,1
+09openldap.kc6.0.1/09OpenLDAP.KC6.0.1.img.manifest.xml,ID統合管理テンプレート,Cent6.0+OpenLDAP/1台起動,m1.small,1
+10samba.kc6.0.1/10Samba.KC6.0.1.img.manifest.xml,ファイルサーバテンプレート,Cent6.0+Samba+CUPS/2台起動,m1.small,2
+11gw.kc6.0.1/11GW.KC6.0.1.img.manifest.xml,グループウェアテンプレート,Cent6.0+Aipo+Tomcat+PostgreSQL/3台起動,c1.medium,3
+12ecm.kc6.0.1/12ECM.KC6.0.1.img.manifest.xml,文書管理テンプレート,Cent6.0+Alfresco+Tomcat+PostgreSQL/3台起動,m1.small,3
+13eip.kc6.0.1/13EIP.KC6.0.1.img.manifest.xml,ポータルテンプレート,Cent6.0+GateIn/3台起動,m1.small,3
+14bi.kc6.0.1/14BI.KC6.0.1.img.manifest.xml,情報分析テンプレート,Cent6.0+Pentaho/3台起動,m1.small,3
+15ad.kc6.0.1/15AD.KC6.0.1.img.manifest.xml,Active Directory連携テンプレート,Cent6.0+OpenLDAP+LISM/1台起動,m1.small,1
+16sso.kc6.0.1/16SSO.KC6.0.1.img.manifest.xml,シングルサインオンテンプレート,Cent6.0+OpenLDAP+OpenAM/3台起動,c1.medium,3
+17jdevsupport.kc6.0.1/17JDevSupport.KC6.0.1.img.manifest.xml,開発支援テンプレート,Cent6.0+Redmine+Jenkins+Subversion/3台起動,c1.medium,3
+18systemmonitoring.kc6.0.1/18SystemMonitoring.KC6.0.1.img.manifest.xml,システム運用監視テンプレート,Cent6.0+Zabbix/2台起動,m1.small,2

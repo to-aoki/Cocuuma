@@ -1,0 +1,202 @@
+---------------------------------------------------
+Cocuuma 1.0 (2013/4)  - インストール方法
+===================================================
+■　動作確認済み環境
+---------------------------------------------------
+CentOS6.x / RHEL6.x
+Apache 2.2.15
+python-2.6.6
+Django 1.3.1
+mod_wsgi 3.3
+euca2ools 2.1.1
+euca-admin-tools 3.1.0
+
+対象クラウド基盤　eucalyptus 3.1.0（rpmインストール）
+
+===================================================
+■　インストール手順
+---------------------------------------------------
+１．Apacheのインストール（必要であれば）
+
+   # yum install httpd
+---------------------------------------------------
+２．euca2ools、euca-admin-toolsのインストールと動作確認
+
+   ● euca2ools, eucalyptus-admin-tools をインストール
+   # scp [clcサーバのアドレス]:/etc/yum.repos.d/euca* /etc/yum.repos.d/
+   （例）：# scp 192.168.100.1:/etc/yum.repos.d/euca* /etc/yum.repos.d/
+   # yum install euca2ools eucalyptus-admin-tools --nogpgcheck
+
+   ● admin@eucalyptus のクレデンシャルをコピー
+   # mkdir /root/.euca
+   # scp [clcサーバのアドレス]:[admin@eucalyptusのクレデンシャルファイルのパス]/* /root/.euca/
+   （例）：# scp 192.168.100.1:/root/.euca/* /root/.euca/
+
+   ● 参照コマンドの動作を確認
+   # euca-describe-availability-zones verbose
+   # euca-describe-nodes
+   # euca-describe-instances verbose
+   ※　クラウドのリソース情報が表示されることを確認
+---------------------------------------------------
+３．Diangoのインストールと動作確認
+
+   ● Djangoのインストール
+   Django-1.3.1.tar.gzをテンポラリディレクトリ（/var/tmpなど）に格納しておく
+   # tar zxvf Django-1.3.1.tar.gz
+   # cd Django-1.3.1
+   # python setup.py install
+
+   ● Djangoの動作確認
+   # python
+   Python 2.6.6 (r266:84292, Jun 18 2012, 14:18:47)
+   [GCC 4.4.6 20110731 (Red Hat 4.4.6-3)] on linux2
+   Type "help", "copyright", "credits" or "license" for more information.
+   >>> import django
+   >>> django.VERSION
+   (1, 3, 1, 'final', 0)
+---------------------------------------------------
+４．Cocuumaのインストールと初期設定
+
+   ● インストール先ディレクトリ作成とCocuumaの配置
+   # mkdir -p /var/lib/cocuuma
+   # cp cocuuma-1.0.zip /var/lib/cocuuma/
+   # cd /var/lib/cocuuma
+   # unzip cocuuma-1.0.zip
+
+   ● DBの初期化
+   # python manage.py syncdb
+   # cd data; sh loaddata.sh; cd ..
+   # python manage.py setup_db
+   ※ 管理ユーザのパスワードは適宜設定してください。
+
+   ● EucalyptusDBへの接続用設定ファイルをコピー
+   # scp [clcサーバのアドレス]:/var/run/eucalyptus/tx/ha_jdbc_auth.xml /var/lib/cocuuma/data/
+   （例）：# scp 192.168.100.1:/var/run/eucalyptus/tx/ha_jdbc_auth.xml /var/lib/cocuuma/data/
+   
+   ● jQueryファイルの配置
+   /var/lib/cocuuma/eucalyptus/static/js/ディレクトリに以下の4つのjQueryファイル
+     jquery-1.7.2.min.js
+     jquery.ui.core.js
+     jquery.ui.progressbar.js
+     jquery.ui.widget.js
+   /var/lib/cocuuma/eucalyptus/static/css/ディレクトリに以下の1つのjQueryファイル
+     jquery.ui.progressbar.css
+   をそれぞれ配置します
+   
+---------------------------------------------------
+５．mod_wsgiのインストール
+
+   ● python-devel, apxs(httpd-devel)を事前にインストール
+   # yum -y install python-devel httpd-devel
+
+   ● mod_wsgiのインストール
+   mod_wsgi-3.3.tar.gzをテンポラリディレクトリ(/var/tmpなど)に配置
+   # tar zxvf mod_wsgi-3.3.tar.gz
+   # cd mod_wsgi-3.3/
+   # ./configure
+   # make
+   # make install
+---------------------------------------------------
+６．Apache/mod_wsgiの設定
+
+   ● cocuumaユーザの作成
+   # useradd cocuuma
+   # passwd cocuuma
+   # chown -R cocuuma.cocuuma /var/lib/cocuuma
+
+   ● Apache設定ファイル(httpd.conf)編集
+   # vi /etc/httpd/conf/httpd.conf
+   --------------------------------------------------------------------------
+   １．起動ユーザ、グループ変更
+   User koala
+   Group koala
+
+   ２．Listenポート変更
+   Listen 16000
+
+   ３．mod_wsgiのロード
+   # Cocuuma Setting
+   LoadModule wsgi_module modules/mod_wsgi.so
+   --------------------------------------------------------------------------
+
+   ● mod_wsgi設定ファイル(mod_wsgi.conf)作成
+   # vi /etc/httpd/conf.d/mod_wsgi.conf
+   --------------------------------------------------------------------------
+   #
+   # Cocuuma Setting
+   #
+   Alias /static/admin/ "/usr/lib/python2.6/site-packages/django/contrib/admin/media/"
+   AliasMatch /static/admin/([^/]*\.css) /usr/lib/python2.6/site-packages/django/contrib/admin/media/css/$1
+   AliasMatch /static/admin/([^/]*\.png) /usr/lib/python2.6/site-packages/django/contrib/admin/media/img/$1
+   AliasMatch /static/admin/([^/]*\.js) /usr/lib/python2.6/site-packages/django/contrib/admin/media/js/$1
+
+   Alias /static/ "/var/lib/sample_tools/gui/koala/eucalyptus/static/"
+   AliasMatch /([^/]*\.css) /var/lib/sample_tools/gui/koala/eucalyptus/static/css/$1
+   AliasMatch /([^/]*\.png) /var/lib/sample_tools/gui/koala/eucalyptus/static/images/$1
+   AliasMatch /([^/]*\.js) /var/lib/sample_tools/gui/koala/eucalyptus/static/js/$1
+
+   <Directory /usr/lib/python2.6/site-packages/django/contrib/admin/media/>
+        Order deny,allow
+        Allow from all
+   </Directory>
+
+   <Directory /var/lib/cocuuma/eucalyptus/static/>
+        Order deny,allow
+        Allow from all
+   </Directory>
+
+   WSGIScriptAlias / /var/lib/cocuuma/koala.wsgi
+   --------------------------------------------------------------------------
+
+   ● Apache 自動起動設定
+   # chkconfig httpd on
+---------------------------------------------------
+７．Cocuuma起動前の設定
+
+   ● Apacheユーザ用のクレデンシャルファイルを配置
+   # mkdir /home/cocuuma/.euca
+   # cp /root/.euca/* /home/cocuuma/.euca/
+   # chown -R cocuuma:cocuuma /home/cocuuma/.euca
+
+   ● Apacheの起動スクリプトでクレデンシャルを読み込み
+   # vi /etc/init.d/httpd.conf
+   --------------------------------------------------------------------------
+   :
+   start() {
+        . /home/koala/.euca/eucarc ←この1行を挿入
+   :
+   --------------------------------------------------------------------------
+
+   ● settings.pyにクラウドのアドレスを設定
+   # vi /var/lib/cocuuma/settings.py
+   --------------------------------------------------------------------------
+   :
+   EUCA_HOST = "[clcサーバのfqdn]"
+   EUCA_DB_HOST = "[clcサーバのfqdn]"
+   :
+   --------------------------------------------------------------------------
+   （例）
+   EUCA_HOST = "eucalyptus.eucadomain.test-cloud.jp"
+   EUCA_DB_HOST = "eucalyptus.eucadomain.test-cloud.jp"
+---------------------------------------------------
+８．cocuumaの起動
+
+   # service httpd start
+---------------------------------------------------
+９．起動後の初期設定
+
+   ● ホストの登録
+   http://[コクーマサーバのアドレス]:16000/admin からDjangoの管理画面に入り
+   「Host」テーブルに実際のホスト情報を入力
+
+   ● 初期課金テーブルの登録
+   http://[コクーマサーバのアドレス]:16000/admin からDjangoの管理画面に入り
+   「Charge」テーブルにレコードを1つ追加（値はデフォルトのままでよい）
+
+※　以上でインストールは終了です
+
+===================================================
+■ Cocuumaへのログイン
+
+   http://[コクーマサーバのアドレス]:16000 でログインページを表示。
+   eucalyptusのアカウント名/ユーザ名/パスワードでログインします。

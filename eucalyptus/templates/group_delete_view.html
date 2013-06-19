@@ -1,0 +1,99 @@
+{% extends "oss_base.html" %}
+
+{% comment %}
+# COPYRIGHT FUJITSU SOCIAL SCIENCE LABORATORY LIMITED 2012
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without modification,
+# are permitted provided that the following conditions are met:
+#
+# + Redistributions of source code must retain the above copyright notice, this list of conditions
+# and the following disclaimer.
+# + Redistributions in binary form must reproduce the above copyright notice, this list of conditions
+# and the following disclaimer in the documentation and/or other materials provided with the distribution.
+# + Neither the name of the FUJITSU SOCIAL SCIENCE LABORATORY LIMITED nor the names of its contributors
+# may be used to endorse or promote products derived from this software without specific prior written
+# permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+# IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+# FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+# CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+{% endcomment %}
+
+{% block title %}Cocuuma{% endblock title %}
+
+{% block link %}
+	<link rel="stylesheet" href="/static/css/user_manage.css" />
+{% endblock %}
+
+{% block script %}
+	<script type="text/javascript" src="/static/js/group_manage_view.js"></script>
+{% endblock %}
+
+{% block content %}
+        <!-- main contents (left, right) start -->
+        <div id="main_contents">
+
+            <!-- left contents start -->
+            <div id="left_contents">
+
+            </div><!-- left contents end -->
+
+            <!-- right contents start -->
+            <div id="right_contents">
+                <div id="right_contents_header">
+                    <h2><img src="/static/images/account.png" class="icons">&nbsp;アクセスグループ管理</h2>
+                </div>
+
+				{% for error in errors %}
+				<br><br>
+				<div class="err_msg">{{error}}</div>
+				{% endfor %}
+
+				<input name="resource_refresh" type="hidden" value="no"/>
+
+				<div class="button_select_area">
+				<table class="button_select" cellspacing="0" cellpadding="0"><tr>
+				<td>
+				<button id="get_ip_button" type="button" onclick="jump('/user_manage/group/createform/')" >グループを作成</button>
+				</td><td>
+				<button type="button" onclick="refresh()" >データ更新</button></td>
+				</table>
+                </div>
+
+                <div class="instance_info_area">
+				<table class="instance_info" cellspacing="0" cellpadding="0">
+				<thead>
+					<tr>
+						<th>削除チェック</th>
+						<th>グループ名</th>
+						<th>説明</th>
+						<th>権限</th>
+						<th>パス</th>
+						<th>アカウント名</th>
+
+					</tr>
+				</thead>
+				<tbody>
+				{% for entry in group_manage_list %}
+				   <tr>
+					   <td>{{ form.del_check }}</td>
+					   <td>{{ entry.group_name }}</td>
+					   <td>{{ entry.group_desc }}</td>
+					   <td>{{ entry.group_pol }}</td>
+					   <td>{{ entry.group_path }}</td>
+					   <td>{{ entry.account_name }}</td>
+				   </tr>
+			   {% endfor %}
+			   </tbody>
+			   </table>
+			</div>
+             </div><!--  right contents end -->
+
+            </div><!-- main contents (left, right) end -->
+{% endblock %}

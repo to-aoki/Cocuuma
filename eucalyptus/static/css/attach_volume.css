@@ -1,0 +1,102 @@
+/*
+#
+# COPYRIGHT FUJITSU SOCIAL SCIENCE LABORATORY LIMITED 2012
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without modification,
+# are permitted provided that the following conditions are met:
+#
+# + Redistributions of source code must retain the above copyright notice, this list of conditions
+# and the following disclaimer.
+# + Redistributions in binary form must reproduce the above copyright notice, this list of conditions
+# and the following disclaimer in the documentation and/or other materials provided with the distribution.
+# + Neither the name of the FUJITSU SOCIAL SCIENCE LABORATORY LIMITED nor the names of its contributors
+# may be used to endorse or promote products derived from this software without specific prior written
+# permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+# IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+# FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+# CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+*/
+
+#left_contents ul.nav {
+    margin:0 0 11px 5px;
+    border-top:1px solid #666666;
+    border-right:1px solid #666666;
+    border-bottom:1px solid #666666;
+    border-left:1px solid #666666;
+    list-style:none;
+    padding:0;
+    }
+
+#create_new_volume{
+    padding:10px 4px;
+}
+
+#left_contents li.left_contents_item {
+    padding:4px 4px 6px 10px;
+    }
+#left_contents li.selected_item,
+#left_contents #create_new_volume:hover,
+#left_contents li.left_contents_item:hover {
+    cursor: pointer;
+    }
+#left_contents .cleate_volume_menu p{
+    font-weight:bold;
+    margin: 0 0 0 0;
+    }
+
+/*left_contentsのグループ見出し*/
+#left_contents li.left_contents_index{
+    background:#D3D3D3;
+    padding:4px 4px 6px 5px;
+    border-bottom: 1px #aaaaaa solid;
+}
+
+#left_contents li.left_contents_index:hover{
+    cursor: default;
+}
+#left_contents table.inner {
+    width: 160px;
+}
+#left_contents table.inner tr td:last-child {
+    width: 20px;
+}
+
+.asterisk{
+    color: #CF0000;
+}
+/* attach_info */
+div.attach_info_area {
+    display:inline-block;
+    width: 670px;
+    margin: 0 0 37px 0;
+    }
+    
+table.attach_info {
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    border-collapse:collapse;
+    }
+
+table.attach_info td{
+    border: 1px solid #9097A9;
+    }
+table.attach_info tr.even{
+    background-color: #f4f4f4;
+    }
+
+table.attach_info td {
+    padding: 3px 5px;
+    text-align: left;
+    }
+#bottom_buttons{
+    float: right;
+}

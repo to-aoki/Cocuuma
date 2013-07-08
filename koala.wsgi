@@ -28,7 +28,7 @@ import os
 import sys
 import django.core.handlers.wsgi
 
-sys.path.append('/var/lib/sample_tools/gui/')
+sys.path.append('/var/lib/cocuuma/')
 os.environ['DJANGO_SETTINGS_MODULE'] = 'koala.settings'
 
 from koala.eucalyptus import monitor

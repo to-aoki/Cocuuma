@@ -33,7 +33,6 @@ euca-admin-tools 3.1.0
    （例）：# scp 192.168.100.1:/root/.euca/* /root/.euca/
 
    ● 参照コマンドの動作を確認
-   # . /root/.euca/eucarc
    # euca-describe-availability-zones verbose
    # euca-describe-nodes
    # euca-describe-instances verbose
@@ -59,9 +58,9 @@ euca-admin-tools 3.1.0
 ４．Cocuumaのインストールと初期設定
 
    ● インストール先ディレクトリ作成とCocuumaの配置
-   # mkdir -p /var/lib/cocuuma/koala
-   # cp cocuuma-1.0.zip /var/lib/cocuuma/koala
-   # cd /var/lib/cocuuma/koala
+   # mkdir -p /var/lib/cocuuma
+   # cp cocuuma-1.0.zip /var/lib/cocuuma/
+   # cd /var/lib/cocuuma
    # unzip cocuuma-1.0.zip
 
    ● DBの初期化
@@ -71,8 +70,18 @@ euca-admin-tools 3.1.0
    ※ 管理ユーザのパスワードは適宜設定してください。
 
    ● EucalyptusDBへの接続用設定ファイルをコピー
-   # scp [clcサーバのアドレス]:/var/run/eucalyptus/tx/ha_jdbc_auth.xml /var/lib/cocuuma/koala/data/
-   （例）：# scp 192.168.100.1:/var/run/eucalyptus/tx/ha_jdbc_auth.xml /var/lib/cocuuma/koala/data/
+   # scp [clcサーバのアドレス]:/var/run/eucalyptus/tx/ha_jdbc_auth.xml /var/lib/cocuuma/data/
+   （例）：# scp 192.168.100.1:/var/run/eucalyptus/tx/ha_jdbc_auth.xml /var/lib/cocuuma/data/
+   
+   ● jQueryファイルの配置
+   /var/lib/cocuuma/eucalyptus/static/js/ディレクトリに以下の4つのjQueryファイル
+     jquery-1.7.2.min.js
+     jquery.ui.core.js
+     jquery.ui.progressbar.js
+     jquery.ui.widget.js
+   /var/lib/cocuuma/eucalyptus/static/css/ディレクトリに以下の1つのjQueryファイル
+     jquery.ui.progressbar.css
+   をそれぞれ配置します
    
 ---------------------------------------------------
 ５．mod_wsgiのインストール
@@ -99,8 +108,8 @@ euca-admin-tools 3.1.0
    # vi /etc/httpd/conf/httpd.conf
    --------------------------------------------------------------------------
    １．起動ユーザ、グループ変更
-   User cocuuma
-   Group cocuuma
+   User koala
+   Group koala
 
    ２．Listenポート変更
    Listen 16000
@@ -121,22 +130,22 @@ euca-admin-tools 3.1.0
    AliasMatch /static/admin/([^/]*\.png) /usr/lib/python2.6/site-packages/django/contrib/admin/media/img/$1
    AliasMatch /static/admin/([^/]*\.js) /usr/lib/python2.6/site-packages/django/contrib/admin/media/js/$1
 
-   Alias /static/ "/var/lib/cocuuma/koala/eucalyptus/static/"
-   AliasMatch /([^/]*\.css) /var/lib/cocuuma/koala/eucalyptus/static/css/$1
-   AliasMatch /([^/]*\.png) /var/lib/cocuuma/koala/eucalyptus/static/images/$1
-   AliasMatch /([^/]*\.js) /var/lib/cocuuma/koala/eucalyptus/static/js/$1
+   Alias /static/ "/var/lib/sample_tools/gui/koala/eucalyptus/static/"
+   AliasMatch /([^/]*\.css) /var/lib/sample_tools/gui/koala/eucalyptus/static/css/$1
+   AliasMatch /([^/]*\.png) /var/lib/sample_tools/gui/koala/eucalyptus/static/images/$1
+   AliasMatch /([^/]*\.js) /var/lib/sample_tools/gui/koala/eucalyptus/static/js/$1
 
    <Directory /usr/lib/python2.6/site-packages/django/contrib/admin/media/>
         Order deny,allow
         Allow from all
    </Directory>
 
-   <Directory /var/lib/cocuuma/koala/eucalyptus/static/>
+   <Directory /var/lib/cocuuma/eucalyptus/static/>
         Order deny,allow
         Allow from all
    </Directory>
 
-   WSGIScriptAlias / /var/lib/cocuuma/koala/koala.wsgi
+   WSGIScriptAlias / /var/lib/cocuuma/koala.wsgi
    --------------------------------------------------------------------------
 
    ● Apache 自動起動設定
@@ -150,16 +159,16 @@ euca-admin-tools 3.1.0
    # chown -R cocuuma:cocuuma /home/cocuuma/.euca
 
    ● Apacheの起動スクリプトでクレデンシャルを読み込み
-   # vi /etc/init.d/httpd
+   # vi /etc/init.d/httpd.conf
    --------------------------------------------------------------------------
    :
    start() {
-        . /home/cocuuma/.euca/eucarc ←この1行を挿入
+        . /home/koala/.euca/eucarc ←この1行を挿入
    :
    --------------------------------------------------------------------------
 
    ● settings.pyにクラウドのアドレスを設定
-   # vi /var/lib/cocuuma/koala/settings.py
+   # vi /var/lib/cocuuma/settings.py
    --------------------------------------------------------------------------
    :
    EUCA_HOST = "[clcサーバのfqdn]"

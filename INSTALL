@@ -60,6 +60,8 @@ euca-admin-tools 3.1.0
 
    ● インストール先ディレクトリ作成とCocuumaの配置
    # mkdir -p /var/lib/cocuuma/koala
+   # mkdir /var/lib/cocuuma/koala/log
+   # mkdir /var/lib/cocuuma/koala/tmp   
    # cp cocuuma-1.0.zip /var/lib/cocuuma/koala
    # cd /var/lib/cocuuma/koala
    # unzip cocuuma-1.0.zip
@@ -93,7 +95,7 @@ euca-admin-tools 3.1.0
    ● cocuumaユーザの作成
    # useradd cocuuma
    # passwd cocuuma
-   # chown -R cocuuma.cocuuma /var/lib/cocuuma
+   # chown -R cocuuma:cocuuma /var/lib/cocuuma
 
    ● Apache設定ファイル(httpd.conf)編集
    # vi /etc/httpd/conf/httpd.conf
@@ -179,6 +181,7 @@ euca-admin-tools 3.1.0
    ● ホストの登録
    http://[コクーマサーバのアドレス]:16000/admin からDjangoの管理画面に入り
    「Host」テーブルに実際のホスト情報を入力
+   ※初期ユーザ/パスワードはroot/rootです
 
    ● 初期課金テーブルの登録
    http://[コクーマサーバのアドレス]:16000/admin からDjangoの管理画面に入り

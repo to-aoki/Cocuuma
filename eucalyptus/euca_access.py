@@ -151,7 +151,8 @@ class EucaEnv(object):
 			is_secure = url.scheme == "https",
 			region = region,
 			port = url.port,
-			path = url.path
+			path = url.path,
+			api_version = '2009-11-30'
 			)
 
 		return connection

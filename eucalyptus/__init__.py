@@ -27,6 +27,11 @@
 import logging
 from koala.settings import EUCA_HOST
 from http import EucalyptusHttpAuthenticator
+from euca_access import GetEucalyptusInfoBy2ool
 logger = logging.getLogger('koalalog')
 EucalyptusHttpAuthenticator.set_logger(logger)
-EucalyptusHttpAuthenticator.global_setting('https',EUCA_HOST,8443,False,'A8CA799DC7C6E4A3F5B3488E53921E2C','96707AA5DBE9B6EF917523C2B5116087')
+tool = GetEucalyptusInfoBy2ool()
+if tool.euca_version >= 330:
+    EucalyptusHttpAuthenticator.global_setting('https',EUCA_HOST,8443,False,'8541FA81099D945E1918ABA616CA5D51','67FDD609B5D6929CB4AEB99DF7D014CE')
+else:
+    EucalyptusHttpAuthenticator.global_setting('https',EUCA_HOST,8443,False,'A8CA799DC7C6E4A3F5B3488E53921E2C','96707AA5DBE9B6EF917523C2B5116087')   

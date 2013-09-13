@@ -972,6 +972,13 @@ def isRootDevice(volume, image_snapshot_list=[]):
 				return True
 	return False
 
+def getInstanceNameFromId(instance_id):
+	m = models.Machine.objects.filter(instance_id=instance_id)
+	if len(m):
+		return models.Machine.objects.get(instance_id=instance_id).name
+	else:
+		return "管理外の仮想サーバ"
+
 def getVolumeList(login_user=None, rootDevice=False):
 	"""データボリューム(EBSボリューム)のリストを取得
 		input: login_user:models.User
@@ -1008,6 +1015,7 @@ def getVolumeList(login_user=None, rootDevice=False):
 		if volume.status == 'in-use':
 			volumeData.attached = True						#アタッチフラグ
 			volumeData.instance_id = volume.attach_data.instance_id		#アタッチ時：インスタンスID
+			volumeData.machine_name = getInstanceNameFromId(volume.attach_data.instance_id)
 			volumeData.device = volume.attach_data.device				#アタッチ時：デバイス
 			volumeData.attach_status = volume.attach_data.status		#アタッチ時：アタッチ状況
 			volumeData.attach_time = getDisplayTime(volume.attach_data.attach_time)		#アタッチ時：アタッチ日時

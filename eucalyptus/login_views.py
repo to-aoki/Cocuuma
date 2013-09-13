@@ -114,6 +114,7 @@ def dologin(request):
 				logger.debug("ユーザとしてログイン")
 			logger.info('ログイン 完了')
 			ver = CocuumaVersion()
+			request.session['isIE'] = (request.META['HTTP_USER_AGENT'].upper().find("MSIE") >= 0)
 			logger.info('Cocuuma version %s / revision %s' % (ver.getVersion(), ver.getLocalRevision()))
 			return HttpResponseRedirect('/dashboard/')
 

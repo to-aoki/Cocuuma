@@ -38,7 +38,7 @@ from resource_models import *
 from models import Host
 
 import logging
-
+import base64
 
 def retry(func):
 	"""Eucalyptusリクエストリトライ用デコレータ"""
@@ -606,6 +606,25 @@ class GetEucalyptusInfoBy2ool(object):
 
 	#カスタムログ
 	logger = logging.getLogger('koalalog')
+	euca_version = 301
+	tool_version = 213
+	
+	def __init__(self, user=None):
+		cmd_ch = 'euca-describe-instances --version'
+		ret_ch = commands.getstatusoutput(cmd_ch)
+		if ret_ch[0] != 0:
+			self.logger.error('eucaツール実行エラー. response=%s' % ret_ch[0])
+			raise Exception('eucaツール実行エラー')
+		version_list = ret_ch[1].splitlines()
+		for ver in version_list:
+			if re.search('(W|w)arning', ver) == None:
+				columns = ver.strip().split()
+				if columns[0] == "eucalyptus":
+					self.euca_version = int(columns[1].replace(".",""))
+					self.logger.debug('eucalyptus version:%d' % self.euca_version)
+				if columns[0] == "euca2ools":
+					self.tool_version = int(columns[1].replace(".",""))
+					self.logger.debug('euca2ools version:%d' % self.tool_version)
 
 	def getInstanceListVerbose(self, user=None):
 		# only for admin@eucalyptus:
@@ -628,30 +647,57 @@ class GetEucalyptusInfoBy2ool(object):
 					#for item in columns:
 					#	logger.debug("item:%s" % item)
 					instance = Instance_information()
-					instance.instanceid = columns[1]
 					instance.accountid = account_number
-					instance.imageid = columns[2]
-					instance.ipaddress = columns[3]
-					instance.privateipaddress = columns[4]
-					instance.status = columns[5]
-					instance.keyname = columns[6]
-					offset = 0
-					if instance.keyname.isdigit() and len(instance.keyname) <= 2:
-						instance.keyname = ""
-						offset -= 1
-					#7:index
-					instance.vmtype = columns[8 + offset]
-					instance.launchtime = columns[9 + offset]
-					#10:cluster
-					#11:eki
-					if columns[11 + offset][0:3] != "eki":
-						offset -= 1
-					#12:eri
-					if columns[12 + offset][0:3] != "eri":
-						offset -= 1
-					#13:monitor
-					#14/15:dns
-					instance.rootdevicetype = columns[16 + offset]
+
+					col = 1
+				#1:instance id
+					instance.instanceid = columns[col]
+					col += 1
+				#2:image id
+					instance.imageid = columns[col]
+					col += 1
+				#3:public ip
+					if columns[col][0].isdigit():
+						instance.ipaddress = columns[col]
+						col += 1
+				#4:private ip
+					if columns[col][0].isdigit():
+						instance.privateipaddress = columns[col]
+						col += 1
+				#5:status
+					instance.status = columns[col]
+					col += 1
+				#6:keypair
+					if not columns[col].isdigit() and len(columns[col]) > 2:
+						instance.keyname = columns[col]
+						col += 1
+				#7:index
+					col += 1
+				#8:vmtype
+					instance.vmtype = columns[col]
+					col += 1
+				#9:launch time
+					instance.launchtime = columns[col]
+					col += 1
+				#10:cluster					
+					col += 1
+				#11:eki
+					if columns[col][0:3] == "eki":
+						col += 1
+				#12:eri
+					if columns[col][0:3] == "eri":
+						col += 1
+				#13:monitor
+					col += 1
+				#14:dns
+					if columns[col][0].isdigit():
+						col += 1
+				#15:dns
+					if columns[col][0].isdigit():
+						col += 1
+				#16:root device type
+					instance.rootdevicetype = columns[col]
+					
 					result_list.append(instance)
 				if columns[0] == "RESERVATION":
 					account_number = columns[2]
@@ -717,26 +763,47 @@ class GetEucalyptusInfoBy2ool(object):
 			self.logger.error('eucaツール実行エラー. response=%s' % ret_ch[0])
 			raise Exception('eucaツール実行エラー')
 
-		node_list = ret_ch[1].splitlines()
 		result_list = []
-		for line in node_list:
-			if re.search('(W|w)arning', line) == None:
-				columns = line.strip().split()
-				if columns[0] == "NODE":
-					#for item in columns:
-					#	logger.debug("item:%s" % item)
-					node = Node_information()
-					node.instanceids = []
-					node.node_ip = columns[1]
-					for i in range(3, len(columns)):
-						node.instanceids.append(columns[i])
-					node.num_ins = node.num_instances()
-					if Host.objects.filter(registered_ip=node.node_ip):
-						host = Host.objects.get(registered_ip=node.node_ip)
-						node.hostname = host.hostname
-						node.monitored_hostname = host.monitored_hostname
-						node.monitored_ip = host.monitored_ip
-					result_list.append(node)
+
+		if self.euca_version >= 330:
+			node_list = ret_ch[1].splitlines()
+			for line in node_list:
+				if re.search('(W|w)arning', line) == None:
+					columns = line.strip().split()
+					if columns[0] == "NODE":
+						node = Node_information()
+						node.instanceids = []
+						node.node_ip = columns[2]
+						if Host.objects.filter(registered_ip=node.node_ip):
+							host = Host.objects.get(registered_ip=node.node_ip)
+							node.hostname = host.hostname
+							node.monitored_hostname = host.monitored_hostname
+							node.monitored_ip = host.monitored_ip
+						result_list.append(node)
+					if columns[0] == "INSTANCE" and result_list:
+						result_list[-1].instanceids.append(columns[1])
+						result_list[-1].num_ins = node.num_instances()
+			
+		else:
+			node_list = ret_ch[1].splitlines()
+			for line in node_list:
+				if re.search('(W|w)arning', line) == None:
+					columns = line.strip().split()
+					if columns[0] == "NODE":
+						#for item in columns:
+						#	logger.debug("item:%s" % item)
+						node = Node_information()
+						node.instanceids = []
+						node.node_ip = columns[1]
+						for i in range(3, len(columns)):
+							node.instanceids.append(columns[i])
+						node.num_ins = node.num_instances()
+						if Host.objects.filter(registered_ip=node.node_ip):
+							host = Host.objects.get(registered_ip=node.node_ip)
+							node.hostname = host.hostname
+							node.monitored_hostname = host.monitored_hostname
+							node.monitored_ip = host.monitored_ip
+						result_list.append(node)
 
 		return result_list;
 
@@ -914,14 +981,44 @@ class GetEucalyptusInfoBy2ool(object):
 	
 	# ユーザツール
 	def getConsoleOutput(self, instance_id, user=None):
-		# only for admin@eucalyptus:
-		cmd_ch = 'euca-get-console-output ' + instance_id + ' -a ' + user.accesskey + ' -s ' + user.secretkey
+		if self.tool_version >= 300:
+			cmd_ch = 'python ' + PROJECT_PATH + '/eucalyptus/euca-get-console-output.py ' + instance_id + ' -I ' + user.accesskey + ' -S ' + user.secretkey
+		else:
+			cmd_ch = 'euca-get-console-output ' + instance_id + ' -a ' + user.accesskey + ' -s ' + user.secretkey
+		self.logger.debug('%s' % cmd_ch)
+		
+		ret_ch = commands.getstatusoutput(cmd_ch)
+		if ret_ch[0] != 0:
+			self.logger.error('eucaツール実行エラー. response=%d' % ret_ch[0])
+			#raise Exception('eucaツール実行エラー')
+			
+		if self.tool_version >= 300:
+			output = ret_ch[1].splitlines()
+			decoded = base64.b64decode(output[2])
+			return output[0] + "\n" + output[1] + "\n" + decoded
+				
+		return ret_ch[1]
+	
+	def registerEbsImage(self, snapshot_id, name, user=None):
+		if self.tool_version >= 300:
+			cmd_ch = 'euca-register --root-device-name vda -s ' + snapshot_id + ' -n ' + name + ' -I ' + user.accesskey + ' -S ' + user.secretkey
+		else:
+			cmd_ch = 'euca-register -s ' + snapshot_id + ' -n ' + name + ' -A ' + user.accesskey + ' -S ' + user.secretkey
 		self.logger.debug('%s' % cmd_ch)
 		ret_ch = commands.getstatusoutput(cmd_ch)
 		if ret_ch[0] != 0:
 			self.logger.error('eucaツール実行エラー. response=%s' % ret_ch[0])
 			raise Exception('eucaツール実行エラー')
-		return ret_ch[1]
+		
+		emi_id = "emi-XXXXXXXX"
+		output_list = ret_ch[1].splitlines()
+		for line in output_list:
+			if re.search('(W|w)arning', line) == None:
+				columns = line.strip().split()
+				if columns[0] == "IMAGE":
+					emi_id = columns[1]
+					
+		return emi_id
 
 #クレデンシャルファイルを取得するクラス
 class GetCredential(object):

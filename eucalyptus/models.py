@@ -230,6 +230,19 @@ class Host(models.Model):
 	class Meta:
 		db_table = 'host'
 
+class CreatingImage(models.Model):
+	snapshot_id = models.CharField(u'スナップショット名',max_length=128)
+	base_template_id = models.IntegerField(u'ベーステンプレートID',default=0)
+	base_image_id = models.CharField(u'作成元イメージID',max_length=128)
+	instance_id = models.CharField(u'作成元インスタンスID',max_length=128)
+	template_name = models.CharField(u'新しいテンプレート名',max_length=128)
+	registered = models.BooleanField(u'登録済み', default=False)
+
+	def __unicode__(self):
+		return self.template_name
+
+	class Meta:
+		db_table = 'creatingimage'
 
 class Policyset(models.Model):
 	psetname = models.CharField(u'権限セット名',max_length=256)

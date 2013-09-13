@@ -222,3 +222,14 @@ table.state_info td {
 	border-style: hidden;
     background-color: #ffffff;
 }
+
+table.template_info {
+    padding:0;
+    margin:0;
+    border-collapse:collapse;
+    width: 450px;
+}
+table.template_info td {
+	border-style: hidden;
+    background-color: #f4f4f4;
+}

@@ -99,7 +99,9 @@
                     </div>
 				{% for m in request.session.ss_mch_editData.machine_list %}
                     <div class="vmachine_info_area">
-                        <h3 class="index"><img src="/static/images/new_machine_mini.png" class="icons">&nbsp;{{m.name}}</h3>
+                        <h3 class="index"><img src="/static/images/new_machine_mini.png" class="icons">&nbsp;{{m.name}}
+                        &nbsp;&nbsp;<img src="/static/images/stat_{{m.status}}.png" alt="{{m.status}}" />&nbsp;{{m.displayStatus}}
+                        </h3>
                         <table class="vmachine_info" cellpadding="0" cellspacing="0">
                             <tr>
                                 <td>サーバ名</td>
@@ -163,8 +165,12 @@
 				{% endfor %}
                     <div id="bottom_buttons">
                         <button type="button" onclick="jump('/machine/step2back/')">&lt;&nbsp;戻る</button>
-                        <button type="button" onclick="jump('/machine/step3save/')">保存のみ</button>
-                        <button type="button" onclick="jump('/machine/step3run/')">保存して起動</button>
+	                    {% if request.session.ss_mch_editData.group_id %} 
+	                        <button type="button" onclick="jump('/machine/step3save/')">編集を保存</button>
+	                    {% else %}
+	                        <button type="button" onclick="jump('/machine/step3save/')">保存のみ</button>
+	                        <button type="button" onclick="jump('/machine/step3run/')">保存して起動</button>
+	                    {% endif %}
                         <button type="button" onclick="jump('/machine/cancel/')">キャンセル</button>
                     </div>
                 </div><!-- right contents end -->

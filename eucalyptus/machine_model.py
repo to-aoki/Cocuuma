@@ -104,6 +104,7 @@ class Machine_append(object):
 		#使用テンプレート
 		self.template_name="設定されていません"
 		self.monitoring = None
+		self.creating_image_name = ""
 
 	@property
 	def db(self):
@@ -117,7 +118,7 @@ class Machine_append(object):
 	def displayStatus(self):
 		"""マシン状態を表示用に変換する"""
 
-		dic = { u"pending":u"起動処理中", u"running":u"起動状態", u"shutting-down":u"停止処理中", u"terminated":u"停止状態", u"stopping":u"中断処理中", u"stopped":u"中断状態"}
+		dic = { u"pending":u"起動処理中", u"running":u"起動状態", u"shutting-down":u"終了処理中", u"terminated":u"初期状態", u"stopping":u"停止処理中", u"stopped":u"停止状態"}
 
 		try:
 			return dic[self.status]
@@ -132,7 +133,7 @@ class Machine_append(object):
 		if self.db.ip:
 			return self.db.ip
 		elif self.auto_ip:
-			return u"自動設定(%s)" % self.auto_ip
+			return u"%s (自動設定)" % self.auto_ip
 		else:
 			return u"指定しない"
 

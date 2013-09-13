@@ -71,6 +71,8 @@ class MachineForm(forms.ModelForm):
 
 
 class BaseMachineFormSet1(BaseFormSet):
+	is_editable = False
+	
 	"""step1.テンプレート選択の可変長フォーム"""
 	def add_fields(self, form, index):
 		super(BaseMachineFormSet1, self).add_fields(form, index)
@@ -90,11 +92,13 @@ class BaseMachineFormSet1(BaseFormSet):
 		form.fields['image_id'] = forms.CharField(widget=forms.HiddenInput)
 		form.fields['vmtype'] = forms.CharField(widget=forms.HiddenInput)
 		form.fields['template_id'] = forms.IntegerField(widget=forms.HiddenInput)
+		form.fields['status'] = forms.CharField(widget=forms.HiddenInput)
+		form.fields['displayStatus'] = forms.CharField(widget=forms.HiddenInput)
 		form.fields['order'] = forms.IntegerField(widget=forms.HiddenInput)
 
 	# フィールドの日本語名辞書
 	nameDic = {"name":u"仮想サーバ名", "image_id":u"イメージID", "vmtype":u"起動タイプ",
-				"template_id":u"テンプレートID", "order":u"表示順", "template_name":u"テンプレート名" }
+				"template_id":u"テンプレートID", "status":u"状態", "displayStatus":u"状態表示", "order":u"表示順", "template_name":u"テンプレート名" }
 
 	# エラーメッセージ変更. is_valid のオーバーライド以外で行えるなら差し替え
 	def is_valid(self):
@@ -113,7 +117,7 @@ class BaseMachineFormSet1(BaseFormSet):
 				form.errors[displayName] = error_list
 
 		return False
-
+	
 class MachineEditForm(forms.Form):
 	"""step2.仮想マシン設定のフォーム"""
 	name = forms.CharField(widget=forms.HiddenInput,required=False)

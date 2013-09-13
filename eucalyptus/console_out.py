@@ -23,32 +23,21 @@
 # WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import base64
+from euca2ools.commands.euca import EucalyptusRequest
+from requestbuilder import Arg
+import sys
 
-from django.contrib import admin
-from koala.eucalyptus.models import Machine
-from koala.eucalyptus.models import User
-from koala.eucalyptus.models import Group
-from koala.eucalyptus.models import MachineGroup
-from koala.eucalyptus.models import Template
-from koala.eucalyptus.models import Image
-from koala.eucalyptus.models import VMType
-from koala.eucalyptus.models import Volume
-from koala.eucalyptus.models import Keypair
-from koala.eucalyptus.models import Charge
-from koala.eucalyptus.models import Host
-from koala.eucalyptus.models import Policyset
-from koala.eucalyptus.models import CreatingImage
+class GetConsoleOutput(EucalyptusRequest):
 
-admin.site.register(Machine)
-admin.site.register(User)
-admin.site.register(Group)
-admin.site.register(MachineGroup)
-admin.site.register(Template)
-admin.site.register(Image)
-admin.site.register(VMType)
-admin.site.register(Volume)
-admin.site.register(Keypair)
-admin.site.register(Charge)
-admin.site.register(Host)
-admin.site.register(Policyset)
-admin.site.register(CreatingImage)
+    DESCRIPTION = 'Retrieve console output for the specified instance'
+    ARGS = [Arg('InstanceId', metavar='INSTANCE', help='''ID of the instance to
+                obtain console output from (required)'''),
+            Arg('-r', '--raw-console-output', action='store_true',
+                route_to=None,
+                help='display raw output without escaping control characters')]
+    
+    def print_result(self, result):
+        print result.get('instanceId', '')
+        print result.get('timestamp', '')
+        print result.get('output', '')

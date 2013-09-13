@@ -47,7 +47,10 @@ import euca_common
 import threading
 import logging
 import copy
-from models import Keypair
+from models import Keypair, CreatingImage, Image
+from db_access_metadata import EucalyptusMetadataDB
+from volume_views import isRootDevice
+from time import strftime, localtime
 
 from zab_monitor_access import ZabbixAccess
 from monitor_models import Monitorings
@@ -508,16 +511,16 @@ def groupupdate(request):
 		"""
 		return HttpResponseRedirect('/machine/')
 
-	isTerminated = True
-	for machine in machineGroupList[activeIndex].machine_list:
-		if machine.status != "terminated":
-			isTerminated = False
-			break
+	#isTerminated = True
+	#for machine in machineGroupList[activeIndex].machine_list:
+	#	if machine.status != "terminated":
+	#		isTerminated = False
+	#		break
 
-	if not isTerminated:
-		errors.append("グループ内の仮想マシンを全て停止してから編集してください。")
+	#if not isTerminated:
+	#	errors.append("グループ内の仮想マシンを全て停止してから編集してください。")
 		#画面表示
-		return render_to_response('machine_list.html',{'machineGroupList':machineGroupList, 'gid_form':gid_form, 'activeObj':activeObj, 'errors':errors}, context_instance=RequestContext(request))
+	#	return render_to_response('machine_list.html',{'machineGroupList':machineGroupList, 'gid_form':gid_form, 'activeObj':activeObj, 'errors':errors}, context_instance=RequestContext(request))
 
 	# マシングループフォーム
 	#group_form = MachineGroupForm(instance=machineGroupList[activeIndex].db)
@@ -565,6 +568,10 @@ def groupupdate(request):
 		machineData['security_group'] = machine.db.security_group		#セキュリティグループ名
 		machineData['avaulability_zone'] = machine.db.avaulability_zone	#AvaulabilityZone
 		machineData['user_data'] = machine.db.user_data					#ユーザーデータ
+		machineData['status'] = machine.status
+		machineData['displayStatus'] = machine.displayStatus
+		if machine.status != "terminated":
+			machineData['instance_id'] = machine.db.instance_id
 		editGroupData.machine_list.append(machineData)
 
 		addTemplateCount -= 1
@@ -588,10 +595,13 @@ def groupupdate(request):
 	machineIndex = 0
 	for cnt, templatedData in enumerate(editGroupData.template_list):
 		initial = []
+		editable = True
 		count = int(templatedData['count'])
 		for i in xrange(0, count):
 			if machineIndex < len(editGroupData.machine_list):
 				machineData = editGroupData.machine_list[machineIndex]
+				if machineData['status'] != 'terminated':
+					editable = False
 				initdic = machineData.copy()
 				initdic['template_name'] = templatedData['template_name']
 				initial.append(initdic)
@@ -599,12 +609,17 @@ def groupupdate(request):
 
 		prefix = "form%d" % cnt
 		old_formset = MachineFormSet1(initial=initial, prefix=prefix)
+		old_formset.is_editable = editable
 		formsetList.append(old_formset)
 
 	logger.info('仮想マシン グループ編集 終了')
 
 	#画面表示
-	return render_to_response('machine_group_create_1.html',{'gid_form':gid_form, 'group_form':group_form, 'formsetList':formsetList}, context_instance=RequestContext(request))
+	return render_to_response('machine_group_create_1.html',
+							{'gid_form':gid_form,
+							'group_form':group_form,
+							'formsetList':formsetList},
+							context_instance=RequestContext(request))
 
 
 
@@ -644,9 +659,29 @@ def addTemplate(request):
 	# 追加済みテンプレート
 	MachineFormSet1 = formset_factory(MachineForm, formset=BaseMachineFormSet1, extra=0)
 	addTemplateLength = int(request.session['ss_mch_addTemplateLength'])
+	
+	#for cnt in xrange(0, addTemplateLength):
+	#	prefix = "form%d" % cnt
+	#	old_formset = MachineFormSet1(request.POST, prefix=prefix)
+	#	formsetList.append(old_formset)
+
 	for cnt in xrange(0, addTemplateLength):
 		prefix = "form%d" % cnt
-		old_formset = MachineFormSet1(request.POST, prefix=prefix)
+		num_machines = int(request.POST[prefix + '-TOTAL_FORMS'])
+		initial = []
+		editable = True
+		for machineNum in xrange(0, num_machines):
+			data = {}
+			for key, value in request.POST.items():
+				split_key = key.split('-')
+				if len(split_key) == 3 and split_key[0] == prefix and int(split_key[1]) == machineNum:
+					data[split_key[2]] = value
+					logger.debug('copying key:%s value:%s' % (key, value))
+			if data['status'] != 'terminated':
+				editable = False
+			initial.append(data)
+		old_formset = MachineFormSet1(initial=initial, prefix=prefix)
+		old_formset.is_editable = editable
 		formsetList.append(old_formset)
 
 	#表示順
@@ -660,12 +695,36 @@ def addTemplate(request):
 			'image_id': targetTemplate.image_id,
 			'vmtype': targetTemplate.vmtype,
 			'template_id': targetTemplate.id,
+			'status': "terminated",
+			'displayStatus': "初期状態",
 			'order': machineLength + cnt }
 		newMachineList.append(data)
 
 	prefix = "form%d" % addTemplateLength
 	formset = MachineFormSet1(initial=newMachineList, prefix=prefix)
+	formset.is_editable = True
 	formsetList.append(formset)
+
+	if 'ss_mch_editData' in request.session:
+		editGroupData = request.session['ss_mch_editData']
+		templatedData = editGroupData.template_base.copy()
+		templatedData['template_id'] = targetTemplate.id
+		templatedData['template_name'] = targetTemplate.name
+		templatedData['count'] = targetTemplate.count
+		editGroupData.template_list.append(templatedData)
+		for cnt in xrange(0, targetTemplate.count):
+			# マシン
+			machineData = editGroupData.machine_base.copy()
+			machineData['name'] = ""					#マシン名
+			machineData['image_id'] = targetTemplate.image_id			#イメージID
+			machineData['vmtype'] = targetTemplate.vmtype				#VMType
+			machineData['template_id'] = targetTemplate.id	#テンプレートID
+			machineData['status'] = "terminated"	#テンプレートID
+			machineData['displayStatus'] = "初期状態"	#テンプレートID
+			machineData['order'] = str(machineLength + cnt)				#表示順
+			editGroupData.machine_list.append(machineData)
+		request.session['ss_mch_editData'] = editGroupData
+		request.session.modified = True
 
 	# 追加済みテンプレート数
 	request.session['ss_mch_addTemplateLength'] = addTemplateLength + 1
@@ -677,6 +736,112 @@ def addTemplate(request):
 	#画面表示
 	return render_to_response('machine_group_create_1.html',{'gid_form':gid_form, 'group_form':group_form, 'formsetList':formsetList}, context_instance=RequestContext(request))
 
+def deleteTemplate(request):
+	"""「1.テンプレート選択」のテンプレート削除ボタン"""
+
+	logger.info('仮想マシン 1.テンプレート選択 テンプレート削除')
+
+	#セッションからログインユーザ情報を取得する
+	#login_user = request.session['ss_usr_user']
+	#フォームからグループIDを取得
+	gid_form = GroupIdForm(request.POST)
+
+	# マシングループフォーム
+	group_form = MachineGroupForm(request.POST)
+
+	logger.debug('form prefix to delete:%s' % request.POST['delFormPrefix'])
+	
+	addTemplateLength = int(request.session['ss_mch_addTemplateLength'])
+
+	formsetList = []
+	MachineFormSet1 = formset_factory(MachineForm, formset=BaseMachineFormSet1, extra=0)
+	copy_cnt = 0
+	del_machine_count = 0
+	del_order_list = []
+	del_template_index = -1
+	copy_order = 0
+	for cnt in xrange(0, addTemplateLength):
+		prefix = "form%d" % cnt
+		num_machines = int(request.POST[prefix + '-TOTAL_FORMS'])
+		if prefix == request.POST['delFormPrefix']:
+			del_machine_count = num_machines
+			del_template_index = cnt
+			for machineNum in xrange(0, num_machines):
+				for key, value in request.POST.items():
+					split_key = key.split('-')
+					if len(split_key) == 3 and split_key[0] == prefix and int(split_key[1]) == machineNum:
+						if split_key[2] == 'order':
+							del_order_list.append(int(value))
+							logger.debug("machine order:%s will deleted" % value)
+			continue
+		copy_prefix = "form%d" % copy_cnt
+		initial = []
+		editable = True
+		for machineNum in xrange(0, num_machines):
+			data = {}
+			for key, value in request.POST.items():
+				split_key = key.split('-')
+				if len(split_key) == 3 and split_key[0] == prefix and int(split_key[1]) == machineNum:
+					if split_key[2] == 'order':
+						continue
+					data[split_key[2]] = value
+					logger.debug('copying key:%s value:%s' % (key, value))
+			data['order'] = str(copy_order);
+			copy_order += 1
+			if data['status'] != 'terminated':
+				editable = False
+			initial.append(data)
+		copy_cnt += 1
+		old_formset = MachineFormSet1(initial=initial, prefix=copy_prefix)
+		old_formset.is_editable = editable
+		formsetList.append(old_formset)
+
+	#表示順
+	machineLength = int(request.session['ss_mch_machineLength'])
+	# 追加済みテンプレート数
+	request.session['ss_mch_addTemplateLength'] = addTemplateLength - 1
+	# 仮想マシン数
+	request.session['ss_mch_machineLength'] = machineLength - del_machine_count
+	
+	if 'ss_mch_editData' in request.session:
+		editGroupData = request.session['ss_mch_editData']
+		if del_template_index >= 0:
+			editGroupData.template_list.pop(del_template_index)
+		index = 0
+		for i in xrange(0, len(editGroupData.machine_list)):
+			order = editGroupData.machine_list[index]['order']
+			deleted = False
+			for del_order in del_order_list:
+				if int(order) == del_order:
+					editGroupData.machine_list.pop(index)
+					deleted = True
+			if not deleted:
+				index += 1
+		# order振り直し
+		for i in xrange(0, len(editGroupData.machine_list)):
+			editGroupData.machine_list[i]['order'] = str(i)
+		request.session['ss_mch_editData'] = editGroupData
+		request.session.modified = True
+
+	logger.info('仮想マシン 1.テンプレート選択 テンプレート削除 終了')
+
+	#画面表示
+	return render_to_response('machine_group_create_1.html',{'gid_form':gid_form, 'group_form':group_form, 'formsetList':formsetList}, context_instance=RequestContext(request))
+
+def machineEditDefault(machineData):
+	noedit = {}
+	noedit['status'] = machineData['status']
+	noedit['displayStatus'] = machineData['displayStatus']
+	if machineData['status'] != 'terminated':
+		noedit['readonly'] = True
+		noedit['ip'] = machineData['ip']
+		noedit['vmtype'] = machineData['vmtype']
+		noedit['volume'] = machineData['volume']
+		noedit['keypair'] = machineData['keypair']
+		noedit['security_group'] = machineData['security_group']
+		noedit['avaulability_zone'] = machineData['avaulability_zone']
+		noedit['user_data'] = machineData['user_data']
+	return noedit
 
 def step1end(request):
 	"""「1.テンプレート選択」の次へボタン"""
@@ -762,6 +927,8 @@ def step1end(request):
 				machineData['image_id'] = form.cleaned_data['image_id']			#イメージID
 				machineData['vmtype'] = form.cleaned_data['vmtype']				#VMType
 				machineData['template_id'] = form.cleaned_data['template_id']	#テンプレートID
+				machineData['status'] = form.cleaned_data['status']
+				machineData['displayStatus'] = form.cleaned_data['displayStatus']
 				machineData['order'] = form.cleaned_data['order']				#表示順
 				editGroupData.machine_list.append(machineData)
 
@@ -803,6 +970,8 @@ def step1end(request):
 					machineData['image_id'] = form.cleaned_data['image_id']			#イメージID
 					machineData['vmtype'] = form.cleaned_data['vmtype']				#VMType
 					machineData['template_id'] = form.cleaned_data['template_id']	#テンプレートID
+					machineData['status'] = form.cleaned_data['status']
+					machineData['displayStatus'] = form.cleaned_data['displayStatus']
 					machineData['order'] = form.cleaned_data['order']				#表示順
 					editGroupData.machine_list.append(machineData)
 					machineLen += 1
@@ -852,7 +1021,7 @@ def step1end(request):
 	# 編集対象のマシン
 	machineIndex = 0
 	request.session['ss_mch_machineIndex'] = machineIndex
-	
+		
 	#try:
 	#	# キーペア一覧を取得
 	#	keypairs = get_euca_info.get_keypairs()
@@ -877,6 +1046,9 @@ def step1end(request):
 	form.fields['ip'].choices = addresslist
 	form.fields['vmtype'].choices = vmtypelist
 	form.fields['volume'].choices = volumelist
+
+	noedit = machineEditDefault(editGroupData.machine_list[machineIndex])
+		
 	#form.set_keypair(keypairlist[0].name)
 	
 	#form.fields['keypair'].choices = keypairlist
@@ -918,7 +1090,13 @@ def step1end(request):
 	logger.info('仮想マシン 1.テンプレート選択 次へ 終了')
 
 	#画面表示
-	return render_to_response('machine_group_create_2.html',{'gid_form':gid_form, 'form':form, 'detail_form':detail_form, 'errors':errors}, context_instance=RequestContext(request))
+	return render_to_response('machine_group_create_2.html',
+							{'gid_form':gid_form, 
+							'form':form, 
+							'detail_form':detail_form, 
+							'noedit':noedit,
+							'errors':errors}, 
+							context_instance=RequestContext(request))
 
 
 def step2select(request, order):
@@ -934,6 +1112,8 @@ def step2select(request, order):
 		gid = gid_form.cleaned_data["group_id"]
 		gid_form = GroupIdForm({'group_id':gid})
 
+	editGroupData = request.session['ss_mch_editData']
+	
 	#入力情報を取得
 	form = MachineEditForm(request.POST)
 	form.fields['ip'].choices = request.session['ss_mch_addresslist']
@@ -975,7 +1155,6 @@ def step2select(request, order):
 	"""
 	入力情報をセッションへ保存
 	"""
-	editGroupData = request.session['ss_mch_editData']
 	oldOrder = int(form.cleaned_data['order'])
 	machineData = editGroupData.machine_list[oldOrder]
 	machineData['ip'] = form.cleaned_data['ip']										#IPアドレス
@@ -1026,6 +1205,8 @@ def step2select(request, order):
 	form.fields['volume'].choices = request.session['ss_mch_volumelist']
 	form.fields['volume_zone'].choices = request.session['ss_mch_volumezonelist']
 
+	noedit = machineEditDefault(editGroupData.machine_list[machineIndex])
+		
 	machineData = editGroupData.machine_list[machineIndex]
 	if machineData['volume'] != 'new':
 		form.fields['volume_size'].widget.attrs['disabled']=True
@@ -1037,7 +1218,12 @@ def step2select(request, order):
 	logger.info('仮想マシン 2.仮想マシン設定 マシン選択 終了')
 
 	#画面表示
-	return render_to_response('machine_group_create_2.html',{'gid_form':gid_form, 'form':form, 'detail_form':detail_form}, context_instance=RequestContext(request))
+	return render_to_response('machine_group_create_2.html',
+							{'gid_form':gid_form, 
+							'form':form,
+							'noedit':noedit, 
+							'detail_form':detail_form}, 
+							context_instance=RequestContext(request))
 
 
 def step1back(request):
@@ -1068,10 +1254,13 @@ def step1back(request):
 	for cnt, templatedData in enumerate(editGroupData.template_list):
 		initial = []
 		count = int(templatedData['count'])
+		editable = True
 		for i in xrange(0, count):
 			if machineIndex < len(editGroupData.machine_list):
 				machineData = editGroupData.machine_list[machineIndex]
 				initdic = machineData.copy()
+				if machineData['status'] != 'terminated':
+					editable = False
 				if initdic['template_id'] == templatedData['template_id']:
 					initdic['template_name'] = templatedData['template_name']
 					initial.append(initdic)
@@ -1083,6 +1272,7 @@ def step1back(request):
 
 		prefix = "form%d" % cnt
 		old_formset = MachineFormSet1(initial=initial, prefix=prefix)
+		old_formset.is_editable = editable
 		formsetList.append(old_formset)
 
 	logger.info('仮想マシン 2.仮想マシン設定 戻る 終了')
@@ -1197,6 +1387,8 @@ def step2detail(request):
 	form.fields['volume'].choices = request.session['ss_mch_volumelist']
 	form.fields['volume_zone'].choices = request.session['ss_mch_volumezonelist']
 
+	noedit = machineEditDefault(machineData)
+
 	detail_form = MachineDetailForm(request.POST)
 	if detail_form.is_valid():
 		detail_form = MachineDetailForm()
@@ -1269,7 +1461,13 @@ def step2detail(request):
 	logger.info('仮想マシン 2.仮想マシン設定 詳細設定 終了')
 
 	#画面表示
-	return render_to_response('machine_group_create_2.html',{'gid_form':gid_form, 'form':form, 'detail_form':detail_form, 'errors':errors}, context_instance=RequestContext(request))
+	return render_to_response('machine_group_create_2.html',
+							{'gid_form':gid_form, 
+							'form':form, 
+							'detail_form':detail_form,
+							'noedit':noedit, 
+							'errors':errors}, 
+							context_instance=RequestContext(request))
 
 
 def step2end(request):
@@ -1367,7 +1565,6 @@ def step2end(request):
 		machineData['user_data'] = form.cleaned_data['user_data']					#ユーザーデータ
 	request.session.modified = True
 
-
 	"""
 	次画面用情報の設定
 	"""
@@ -1407,6 +1604,8 @@ def step2back(request):
 	form.fields['volume'].choices = request.session['ss_mch_volumelist']
 	form.fields['volume_zone'].choices = request.session['ss_mch_volumezonelist']
 
+	noedit = machineEditDefault(editGroupData.machine_list[machineIndex])
+		
 	machineData = editGroupData.machine_list[machineIndex]
 	if machineData['volume'] != 'new':
 		form.fields['volume_size'].widget.attrs['disabled']=True
@@ -1417,7 +1616,12 @@ def step2back(request):
 	logger.info('仮想マシン 3.構成確認 戻る 終了')
 
 	#画面表示
-	return render_to_response('machine_group_create_2.html',{'gid_form':gid_form, 'form':form, 'detail_form':detail_form}, context_instance=RequestContext(request))
+	return render_to_response('machine_group_create_2.html',
+							{'gid_form':gid_form, 
+							'form':form,
+							'noedit':noedit, 
+							'detail_form':detail_form}, 
+							context_instance=RequestContext(request))
 
 
 def step3run(request):
@@ -1912,6 +2116,7 @@ def getMachineGroupList(login_user=None, nonGroupMachines=None):
 			else:
 				# インスタンス一覧に存在しない場合は状態を"terminated"に設定
 				machine.status = "terminated"
+				machine.db.instance_id = ""
 			if Template.objects.filter(id=machine.db.template_id):
 				template = Template.objects.get(id=machine.db.template_id)
 				machine.template_name = template.name
@@ -1938,6 +2143,48 @@ def getMachineGroupList(login_user=None, nonGroupMachines=None):
 						#zabb.updateItemDelay('vfs.fs.discovery', machine.db.instance_id, 60, "discovery")
 						#zabb.updateItemDelay('vfs.fs.size[/,total]', machine.db.instance_id, 60)
 				machine.monitoring = mon
+
+			creatingImage = CreatingImage.objects.filter(instance_id=machine.db.instance_id)
+			if creatingImage:
+				cImage = creatingImage[0]
+				if not cImage.registered:
+					snap_list = get_euca_info.get_snapshotlist()
+					snapDone = False
+					for snap in snap_list:
+						if snap.id == cImage.snapshot_id and snap.status == "completed":
+							snapDone = True
+					if snapDone:
+						img_name = login_user.id + "-" + strftime("%Y%m%d%H%M%S", localtime())
+						tool=GetEucalyptusInfoBy2ool()
+						emi_id = tool.registerEbsImage(cImage.snapshot_id, img_name, login_user)
+						logger.info("new emi registered:%s" % emi_id)
+						if tool.euca_version < 330:
+							get_euca_info.modify_image_attribute_groups(emi_id,'remove',groups=['all'])
+						cImage.base_image_id = emi_id
+						img = Image()
+						img.image_id = emi_id
+						img.description = ""
+						img.name = emi_id
+						img.save()
+						cImage.registered = True
+						cImage.save()
+					else:
+						machine.creating_image_name = creatingImage[0].template_name
+					
+				if cImage.registered:
+					logger.info("creating new template : %s" % cImage.template_name)
+					template = Template()
+					base_template = Template.objects.get(id=cImage.base_template_id)
+					template.account_id = base_template.account_id
+					template.name = cImage.template_name
+					template.count = base_template.count
+					template.description = base_template.description
+					template.image_id = cImage.base_image_id
+					template.kind = 0
+					template.vmtype = base_template.vmtype
+					template.user_id = base_template.user_id
+					template.save()
+					cImage.delete()
 
 			machineGroup.machine_list.append(machine)
 
@@ -2353,6 +2600,8 @@ def saveMachineGroup(login_user=None, editGroupData=None, errors=None):
 		db_machine.user_data = machine['user_data']
 		db_machine.template_id = machine['template_id']
 		db_machine.order = machine['order']
+		if 'instance_id' in  machine:
+			db_machine.instance_id = machine['instance_id']
 
 		# DB更新
 		db_machine.save()
@@ -2396,28 +2645,28 @@ def saveMachineGroup(login_user=None, editGroupData=None, errors=None):
 
 		i = i + 1
 
-	if editGroupData.group_id:
+	#if editGroupData.group_id:
 		#サーバ登録後処理(DBから消されたボリュームを削除する)
-		db_vols = Volume.objects.filter(user_id=login_user.id, account_id=login_user.account_id)
+	#	db_vols = Volume.objects.filter(user_id=login_user.id, account_id=login_user.account_id)
 
-		for vol in old_volume_list:
+	#	for vol in old_volume_list:
 
-			deleteFlag = True
+	#		deleteFlag = True
 
-			for new_vol in db_vols:
+	#		for new_vol in db_vols:
 
-				if vol.volume_id == new_vol.volume_id:
-					deleteFlag = False
+	#			if vol.volume_id == new_vol.volume_id:
+	#				deleteFlag = False
 
-			if deleteFlag:
-				try:
-					get_euca_info=GetEucalyptusInfo(login_user)
-					get_euca_info.delete_volume(vol.volume_id)
+	#		if deleteFlag:
+	#			try:
+	#				get_euca_info=GetEucalyptusInfo(login_user)
+	#				get_euca_info.delete_volume(vol.volume_id)
 
-				except Exception, ex:
+	#			except Exception, ex:
 					# Eucalyptusエラー
-					errors.append(euca_common.get_euca_error_msg('%s' % ex))
-					logger.warn(errors)
+	#				errors.append(euca_common.get_euca_error_msg('%s' % ex))
+	#				logger.warn(errors)
 
 	#トランザクション制御は'@transaction.commit_on_success'デコレータで関数正常終了時にcommit
 	return db_group.id
@@ -2774,3 +3023,83 @@ def get_console(request, instance_id):
 		errors.append(euca_common.get_euca_error_msg('%s' % ex))
 
 	return render_to_response('console_output.html',{'output':output, 'errors':errors}, context_instance=RequestContext(request))
+
+def createimage(request, machine_id):
+
+	logger.info('マシンイメージ 作成開始')
+	gid_form = GroupIdForm(request.POST)
+
+	errors = []
+	if gid_form.is_valid():
+		gid = gid_form.cleaned_data["group_id"]
+	else:
+		logger.debug("form not valid")
+		#TODO:エラー処理
+		return HttpResponseRedirect('/machine/')
+
+	machineGroupList = request.session['ss_mch_list']
+	isActive=False
+	activeIndex = 0
+	for i, machineGroup in enumerate(machineGroupList):
+		if gid == machineGroup.db.id:
+			activeIndex = i
+			isActive=True
+			break
+	if not isActive:
+		logger.debug("gid %s not valid" % gid)
+		return HttpResponseRedirect('/machine/')
+
+	#選択されたマシングループをアクティブ状態に設定
+	activeObj = machineGroupList[activeIndex]
+	gid_form = GroupIdForm({'group_id':machineGroupList[activeIndex].db.id})
+
+	if 'creating_template_name' in request.POST and request.POST['creating_template_name'] != "":
+		cImage = CreatingImage()
+		template_name = request.POST['creating_template_name']
+		num = 1
+		while models.Template.objects.filter(name=template_name):
+			num += 1
+			template_name = request.POST['creating_template_name'] + "-" + str(num)
+		cImage.template_name = template_name
+		
+		mac = None
+		for machine in activeObj.machine_list:
+			if machine.db.id == int(machine_id):
+				mac = machine
+				break
+		if mac:
+			logger.debug('creating image from :%s' % machine_id)
+			login_user = request.session['ss_usr_user']
+			get_euca_info=GetEucalyptusInfo(login_user)
+			
+			volumes = get_euca_info.get_volumelist()
+			euca_metadata = EucalyptusMetadataDB()
+			image_snapshot_list = euca_metadata.getImageSnapshotList()
+
+			volumeToGetSnapshot = ""			
+			for vol in volumes:
+				if vol.status == "in-use" and vol.attach_data.instance_id == mac.db.instance_id:
+					if isRootDevice(vol, image_snapshot_list):
+						volumeToGetSnapshot = vol.id
+			if volumeToGetSnapshot:
+				try:
+					created_snapshot = get_euca_info.create_snapshot(volume_id=volumeToGetSnapshot)
+				except Exception, ex:
+					# Eucalyptusエラー
+					errors.append(euca_common.get_euca_error_msg('%s' % ex))
+					logger.warn(errors)
+					return render_to_response('machine_list.html',{'gid_form':gid_form, 'activeObj':activeObj, 'errors':errors}, context_instance=RequestContext(request))
+				
+				cImage.instance_id = mac.db.instance_id
+				cImage.base_template_id = mac.db.template_id
+				cImage.base_image_id = mac.db.image_id
+				cImage.snapshot_id = created_snapshot.id
+				cImage.save()
+				mac.creating_image_name = cImage.template_name
+				request.session.modified = True
+			
+	else:
+		logger.debug('parameter error')
+
+	return render_to_response('machine_list.html',{'gid_form':gid_form, 'activeObj':activeObj, 'errors':errors}, context_instance=RequestContext(request))
+

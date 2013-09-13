@@ -57,3 +57,90 @@ function console_output_window(instance_id){
     url = "/machine/getconsole/" + instance_id　+ "/";
 	window.open(url,"window01","width=800,height=600,status=no,scrollbars=yes");
 }
+
+function create_image(machine_id, init_name){
+    template_name = window.prompt("新しいテンプレート名を入力してください", init_name)
+	if( template_name ) {
+		var f = document.getElementById("form1");
+		f.action = "/machine/createimage/" + machine_id　+ "/";
+		f.elements['creating_template_name'].value = template_name;
+		f.submit();
+	}
+}
+
+function isIE()
+{
+	var userAgent = window.navigator.userAgent.toLowerCase();
+	if (userAgent.indexOf('msie') != -1) {
+		return true
+	} else {
+		return false
+	}
+}
+
+function mySetCookie(myCookie,myValue,myDay){
+   myExp = new Date();
+   myExp.setTime(myExp.getTime()+(myDay*24*60*60*1000));
+   myItem = "@" + myCookie + "=" + escape(myValue) + ";";
+   myExpires = "expires="+myExp.toGMTString();
+   myPath = "path=/;";
+   document.cookie =  myItem + myPath + myExpires;
+}
+
+function myGetCookie(myCookie){
+   myCookie = "@" + myCookie + "=";
+   myValue = null;
+   myStr = document.cookie + ";" ;
+   myOfst = myStr.indexOf(myCookie);
+   if (myOfst != -1){
+      myStart = myOfst + myCookie.length;
+      myEnd   = myStr.indexOf(";" , myStart);
+      myValue = unescape(myStr.substring(myStart,myEnd));
+   }
+   return myValue;
+}
+
+function sshLogin(machine_id)
+{
+	if ( isIE() ) {
+	    ip = document.getElementById("address_" + machine_id).innerHTML.split(" ")[0]
+	    if ( !ip ) {
+		    window.alert("IPアドレスが取得できませんでした")
+		    return
+		}
+		keypath = myGetCookie("RSA_PUBLIC_KEY_PATH")
+		exepath = myGetCookie("SSH_TERMINAL_PATH")
+		options = myGetCookie("SSH_TERMINAL_OPTIONS")
+		if ( !keypath || !exepath || !options || !window.confirm(ip + " にログイン\n前回の設定でログインします") ) {
+			if ( exepath ) {
+				exepath = window.prompt("login to " + ip + " : SSHターミナル・プログラムのパスを入力してください", exepath)
+			} else {
+				exepath = window.prompt("login to " + ip + " : SSHターミナル・プログラムのパスを入力してください", '\"C:\\Program Files\\teraterm\\ttermpro.exe\"')
+			}
+			if ( !exepath ) return
+			if ( options ) {
+				options = window.prompt("SSHターミナル・プログラムのオプションを入力してください", options)
+			} else {
+				options = window.prompt("SSHターミナル・プログラムのオプションを入力してください", "/user=root /auth=publickey /keyfile=")
+			}
+			if ( !options ) return
+			if ( keypath ) {
+				keypath = window.prompt("RSAプライベート・キーのパスを入力してください", keypath)
+			} else {
+				keypath = window.prompt("RSAプライベート・キーのパスを入力してください", "")
+			}
+			if ( !keypath ) return
+		}
+		if ( keypath && exepath && options) {
+			mySetCookie("RSA_PUBLIC_KEY_PATH",keypath,365)
+			mySetCookie("SSH_TERMINAL_PATH",exepath,365)
+			mySetCookie("SSH_TERMINAL_OPTIONS",options,365)
+			wshshell=new ActiveXObject("WScript.Shell")
+			//wshshell.run("\"C:\\Program Files (x86)\\teraterm\\ttermpro.exe\" " + ip + " /user=root /auth=publickey /keyfile=" + keypath)
+			wshshell.run(exepath + " " + ip + " " + options + keypath)
+		}
+	}
+	else {
+		window.alert("プログラムの呼び出しはIEからのみ有効です")
+	}
+}

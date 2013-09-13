@@ -198,6 +198,7 @@ function setAutoRefresh() {
 				{{ gid_form.group_id }}
 
                 <!-- right contents start -->
+                <input type="hidden" name="creating_template_name" value="">
                 <div id="right_contents">
 					<div id="right_contents_header">
 						<h2><img src="/static/images/machines.png" class="icons">&nbsp;仮想サーバグループ</h2>
@@ -206,14 +207,14 @@ function setAutoRefresh() {
 							<tr>
 								<td rowspan="2"><button type="button" onclick="jump('/machine/refresh/')" >表示更新</button></td>
 								<td rowspan="2">状態アイコンの説明</td>
-								<td><img src="/static/images/stat_terminated.png" alt="terminated" />&nbsp;停止状態</td>
+								<td><img src="/static/images/stat_terminated.png" alt="terminated" />&nbsp;初期状態</td>
 								<td><img src="/static/images/stat_pending.png" alt="pending" />&nbsp;起動処理中</td>
 								<td><img src="/static/images/stat_running.png" alt="running" />&nbsp;起動状態</td>
 							</tr>
 							<tr>
-								<td><img src="/static/images/stat_shutting-down.png" alt="shutting-down" />&nbsp;停止処理中</td>
-								<td><img src="/static/images/stat_stopping.png" alt="stopping" />&nbsp;中断処理中</td>
-								<td><img src="/static/images/stat_stopped.png" alt="stopped" />&nbsp;中断状態</td>
+								<td><img src="/static/images/stat_shutting-down.png" alt="shutting-down" />&nbsp;終了処理中</td>
+								<td><img src="/static/images/stat_stopping.png" alt="stopping" />&nbsp;停止処理中</td>
+								<td><img src="/static/images/stat_stopped.png" alt="stopped" />&nbsp;停止状態</td>
 								<!-- <td colspan="2"><img src="/static/images/stat_unknown.png" alt="unknown" />&nbsp;起動状態と停止状態のサーバが混在</td> -->
 							</tr>
 						</table>{% endif %}
@@ -225,9 +226,10 @@ function setAutoRefresh() {
                     <div class="vmachine_info_area">
                         <h3 class="index">
                             <span>起動構成</span>
-                            <button type="button" id="grouprun" onclick="jump('/machine/grouprun/')" {% ifequal activeObj.status "pending" %}disabled{% else %}{% ifequal activeObj.status "running" %}disabled{% endifequal %}{% endifequal %} >この構成を起動</button>
-                            <button type="button" id="groupterminate" onclick="jump('/machine/groupterminate/')" {% ifequal activeObj.status "terminated" %}disabled{% endifequal %} {% ifequal activeObj.status "stopping" %}disabled{% endifequal %} >この構成を停止</button>
-                            <button type="button" id="groupupdate" onclick="jump('/machine/groupupdate/')" {% ifnotequal activeObj.status "terminated" %}disabled{% endifnotequal %} >この構成を編集</button>
+                            <!-- <button type="button" id="grouprun" onclick="jump('/machine/grouprun/')" {% ifequal activeObj.status "pending" %}disabled{% else %}{% ifequal activeObj.status "running" %}disabled{% endifequal %}{% endifequal %} >この構成を起動</button> -->
+                            <!-- <button type="button" id="groupterminate" onclick="jump('/machine/groupterminate/')" {% ifequal activeObj.status "terminated" %}disabled{% endifequal %} {% ifequal activeObj.status "stopping" %}disabled{% endifequal %} >この構成を停止</button> -->
+                            <!-- <button type="button" id="groupupdate" onclick="jump('/machine/groupupdate/')" {% ifnotequal activeObj.status "terminated" %}disabled{% endifnotequal %} >この構成を編集</button> -->
+                            <button type="button" id="groupupdate" onclick="jump('/machine/groupupdate/')">この構成を編集</button>
                             <button type="button" id="groupdelete" onclick="confirmJump('この構成を削除しますか？', '/machine/groupdelete/')" {% ifnotequal activeObj.status "terminated" %}disabled{% endifnotequal %} >この構成を削除</button>
                         </h3>
                         <table class="vmachine_info" id="group_info" cellpadding="0" cellspacing="0">
@@ -254,9 +256,9 @@ function setAutoRefresh() {
                             <img src="/static/images/virtual_machine_mini.png" class="icons">
                             <span>{{m.db.name}}</span>
                             <button type="button" id="machinerun_{{m.db.id}}" onclick="jump('/machine/machinerun/{{m.db.id}}/')" {% ifnotequal m.status "terminated" %}disabled{% endifnotequal %} >このマシンを起動</button>
-                            <button type="button" id="machineterminate_{{m.db.id}}" onclick="jump('/machine/machineterminate/{{m.db.id}}/')" {% ifequal m.status "terminated" %}disabled{% endifequal %}{% ifequal m.status "stopping" %}disabled{% endifequal %} >このマシンを停止</button>
+                            <button type="button" id="machineterminate_{{m.db.id}}" onclick="jump('/machine/machineterminate/{{m.db.id}}/')" {% ifequal m.status "terminated" %}disabled{% endifequal %}{% ifequal m.status "stopping" %}disabled{% endifequal %} >このマシンを終了</button>
                         {% if m.device_type == "ebs" %}
-                            <button type="button" id="machinestop_{{m.db.id}}" onclick="jump('/machine/machinestop/{{m.db.id}}/')" {% ifnotequal m.status "running" %}disabled{% endifnotequal %} >このマシンを中断</button>
+                            <button type="button" id="machinestop_{{m.db.id}}" onclick="jump('/machine/machinestop/{{m.db.id}}/')" {% ifnotequal m.status "running" %}disabled{% endifnotequal %} >このマシンを停止</button>
                             <button type="button" id="machinestart_{{m.db.id}}" onclick="jump('/machine/machinestart/{{m.db.id}}/')" {% ifnotequal m.status "stopped" %}disabled{% endifnotequal %} >このマシンを再開</button>
                         {% endif %}
 {% comment %}
@@ -267,12 +269,23 @@ function setAutoRefresh() {
                             <tr>
                                 <td>仮想サーバ名</td>
                                 <td class="icon"></td>
-                                <td>{{m.db.name}}</td>
+                                <td>{{m.db.name}}{% if m.db.instance_id %} : {{ m.db.instance_id }}{% endif %}</td>
                             </tr>
                             <tr>
                                 <td>テンプレート</td>
                                 <td class="icon"><img src="/static/images/template_tin.png" class="icons"></td>
-                                <td>{{m.template_name}}</td>
+                                <td>
+                               	<table class="template_info" cellspacing="0" cellpadding="0"><tr>
+                                <td>{{m.template_name}}</td><td>
+		                        {% if m.device_type == "ebs" %}
+		                        	{% if m.creating_image_name %}
+		                        		このマシンからテンプレート"{{ m.creating_image_name }}"を作成中です
+		                        	{% else %}
+	                            		<button type="button" id="imagecreate_{{m.db.id}}" onclick="create_image('{{m.db.id}}', '{{m.template_name}}')" {% ifnotequal m.status "stopped" %}disabled{% endifnotequal %} >このマシンからテンプレートを作成</button>
+	                            	{% endif %}
+                                {% endif %}
+                                </td></tr></table>
+                                </td>
                             </tr>
                             <tr>
                                 <td>状態</td>
@@ -284,6 +297,9 @@ function setAutoRefresh() {
                                 	</td>
 	                            	<td>
 	                            	<button type="button" id="getconsole_{{m.db.id}}" onclick="console_output_window('{{m.db.instance_id}}')" {% ifnotequal m.status "running" %}disabled{% endifnotequal %} >コンソール出力を表示</button>
+	                            	{% if request.session.isIE %}
+	                            	<button type="button" id="sshlogin_{{m.db.id}}" onclick="sshLogin('{{ m.db.id }}')" {% ifnotequal m.status "running" %}disabled{% endifnotequal %} >ssh ログイン</button>
+	                            	{% endif %}
 	                            	</td><td></td>
 	                            	</tr><tr></tr></table>
                                 </td>

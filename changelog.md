@@ -1,11 +1,9 @@
 ## v1.0 - 2013/06/23
-------
-‰‰ñƒŠƒŠ[ƒX
+åˆå›žãƒªãƒªãƒ¼ã‚¹
 
 ## v1.1 - 2013/09/17
-------
-Šù‚ÉCocuuma(v1.0)‚ð‚²—˜—p‚Ìê‡‚Ív1.1‚ÌŽ‘ŽY‚Éã‘‚«‚µ‚½Œã‚ÉA
-ŽŸ‚ÌƒRƒ}ƒ“ƒh‚É‚æ‚è—˜—p’†‚ÌDBƒXƒL[ƒ}‚ðC³‚µ‚Ä‚­‚¾‚³‚¢B
+æ—¢ã«Cocuuma(v1.0)ã‚’ã”åˆ©ç”¨ã®å ´åˆã¯v1.1ã®è³‡ç”£ã«ä¸Šæ›¸ãã—ãŸå¾Œã«ã€
+æ¬¡ã®ã‚³ãƒžãƒ³ãƒ‰ã«ã‚ˆã‚Šåˆ©ç”¨ä¸­ã®DBã‚¹ã‚­ãƒ¼ãƒžã‚’ä¿®æ­£ã—ã¦ãã ã•ã„ã€‚
 ```lang
 # su - cocuuma
 $ cd /var/lib/cocuuma/koala/
@@ -13,16 +11,16 @@ $ python manage.py syncdb
 ```
 
 Features:
-  - ‰¼‘zƒT[ƒoƒy[ƒW‚Ìƒ{ƒ^ƒ“‚Ì—pŒê‚ðC³
-  - ƒRƒ“ƒ\[ƒ‹o—Í 3.3 ‘Î‰žibase64j
-  - eucalyptus 3.3‘Î‰ž
-  -- eucalyptus/euca2ools‚Ìƒo[ƒWƒ‡ƒ“Žæ“¾
-  -- loginŽž‚ÌƒŠƒNƒGƒXƒgID‘I‘ð
-  -- describe nodes‚Ìƒp[ƒX•û–@
-  -- ŠÇ—ƒƒjƒ…[‚ÉƒCƒ“ƒXƒ^ƒ“ƒXƒŠƒXƒgŽæ“¾
-  - ‰¼‘zƒT[ƒoƒy[ƒW„‰¼‘zƒT[ƒo–¼‚ÉƒCƒ“ƒXƒ^ƒ“ƒXID‚ð•\Ž¦
-  - ƒf[ƒ^ƒ{ƒŠƒ…[ƒ€ƒy[ƒW„ƒAƒ^ƒbƒ`æ‰¼‘zƒ}ƒVƒ“‚Éƒ}ƒVƒ“–¼‚ð•\Ž¦
-  - ‰¼‘zƒT[ƒo‹N“®’†‚Å‚àƒT[ƒoƒOƒ‹[ƒv‚Ì•ÒW‚ð‰Â”\‚É
-  - ƒT[ƒoƒOƒ‹[ƒv‚Ì‰¼‘zƒ}ƒVƒ“‚Ìíœ‚ð‰Â”\‚Éiƒeƒ“ƒvƒŒ[ƒg’PˆÊ‚Åj
-  - ‰¼‘zƒT[ƒoƒy[ƒW@u‚±‚Ìƒ}ƒVƒ“‚©‚çƒeƒ“ƒvƒŒ[ƒg‚ðì¬vƒ{ƒ^ƒ“ŽÀ‘•iEBSƒu[ƒgƒCƒ“ƒXƒ^ƒ“ƒX‚Ì‚Ýj
-  - ‰¼‘zƒT[ƒo‰æ–Ê‚©‚ç‚ÌSSHƒ^[ƒ~ƒiƒ‹ƒvƒƒOƒ‰ƒ€‚ÌŒÄ‚Ño‚µuSSHƒƒOƒCƒ“vƒ{ƒ^ƒ“iIE‚Ì‚Ý“®ìj
+  - ä»®æƒ³ã‚µãƒ¼ãƒãƒšãƒ¼ã‚¸ã®ãƒœã‚¿ãƒ³ã®ç”¨èªžã‚’ä¿®æ­£
+  - ã‚³ãƒ³ã‚½ãƒ¼ãƒ«å‡ºåŠ› 3.3 å¯¾å¿œï¼ˆbase64ï¼‰
+  - eucalyptus 3.3å¯¾å¿œ
+  -- eucalyptus/euca2oolsã®ãƒãƒ¼ã‚¸ãƒ§ãƒ³å–å¾—
+  -- loginæ™‚ã®ãƒªã‚¯ã‚¨ã‚¹ãƒˆIDé¸æŠž
+  -- describe nodesã®ãƒ‘ãƒ¼ã‚¹æ–¹æ³•
+  -- ç®¡ç†ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã«ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ãƒªã‚¹ãƒˆå–å¾—
+  - ä»®æƒ³ã‚µãƒ¼ãƒãƒšãƒ¼ã‚¸ï¼žä»®æƒ³ã‚µãƒ¼ãƒåã«ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹IDã‚’è¡¨ç¤º
+  - ãƒ‡ãƒ¼ã‚¿ãƒœãƒªãƒ¥ãƒ¼ãƒ ãƒšãƒ¼ã‚¸ï¼žã‚¢ã‚¿ãƒƒãƒå…ˆä»®æƒ³ãƒžã‚·ãƒ³ã«ãƒžã‚·ãƒ³åã‚’è¡¨ç¤º
+  - ä»®æƒ³ã‚µãƒ¼ãƒèµ·å‹•ä¸­ã§ã‚‚ã‚µãƒ¼ãƒã‚°ãƒ«ãƒ¼ãƒ—ã®ç·¨é›†ã‚’å¯èƒ½ã«
+  - ã‚µãƒ¼ãƒã‚°ãƒ«ãƒ¼ãƒ—ã®ä»®æƒ³ãƒžã‚·ãƒ³ã®å‰Šé™¤ã‚’å¯èƒ½ã«ï¼ˆãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆå˜ä½ã§ï¼‰
+  - ä»®æƒ³ã‚µãƒ¼ãƒãƒšãƒ¼ã‚¸ã€€ã€Œã“ã®ãƒžã‚·ãƒ³ã‹ã‚‰ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆã‚’ä½œæˆã€ãƒœã‚¿ãƒ³å®Ÿè£…ï¼ˆEBSãƒ–ãƒ¼ãƒˆã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã®ã¿ï¼‰
+  - ä»®æƒ³ã‚µãƒ¼ãƒç”»é¢ã‹ã‚‰ã®SSHã‚¿ãƒ¼ãƒŸãƒŠãƒ«ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã®å‘¼ã³å‡ºã—ã€ŒSSHãƒ­ã‚°ã‚¤ãƒ³ã€ãƒœã‚¿ãƒ³ï¼ˆIEã®ã¿å‹•ä½œï¼‰

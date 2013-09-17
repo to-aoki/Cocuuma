@@ -52,6 +52,7 @@ Licensed under the [Apache License, Version 2.0][Apache]
 + eucalyptus/monitor.py  
 
 Licensed under the [MIT license][MIT]  
++ eucalyptus/static/js/jquery-1.7.2.min.js
 + eucalyptus/static/js/jquery.ui.core.js  
 + eucalyptus/static/js/jquery.ui.progressbar.js  
 + eucalyptus/static/js/jquery.ui.widget.js  

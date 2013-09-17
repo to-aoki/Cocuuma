@@ -44,7 +44,21 @@ eucalyptus-admin-tools
 ライセンス
 ----------
 Copyright &copy; 2013 FUJITSU SOCIAL SCIENCE LABORATORY LIMITED  
-Licensed under the 3-clause BSD license  
+Licensed under the [3-clause BSD license][3BSD]
+
+以下についてはライセンスが異なります。
+
+Licensed under the [Apache License, Version 2.0][Apache]  
++ eucalyptus/monitor.py  
+
+Licensed under the [MIT license][MIT]  
++ eucalyptus/static/js/jquery.ui.core.js  
++ eucalyptus/static/js/jquery.ui.progressbar.js  
++ eucalyptus/static/js/jquery.ui.widget.js  
+
+[3BSD]: http://opensource.org/licenses/BSD-3-Clause  
+[Apache]: http://www.apache.org/licenses/LICENSE-2.0  
+[MIT]: http://www.opensource.org/licenses/mit-license.php  
 
 お問い合わせ先
 ------

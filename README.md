@@ -41,6 +41,11 @@ mod_wsgi 3.3
 euca2ools  
 eucalyptus-admin-tools  
 
+ライセンス
+----------
+Copyright &copy; 2013 FUJITSU SOCIAL SCIENCE LABORATORY LIMITED  
+Licensed under the 3-clause BSD license  
+
 お問い合わせ先
 ------
 email: cocuuma@googlegroups.com

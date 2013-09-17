@@ -1,7 +1,7 @@
 Cocuuma
 ======================
 Cloud on Open-source CUstom Ui vm MAnager  
-v.1.0 (2013/4)  
+v.1.1 (2013/9/17)  
 Cocuumaはオープンソースクラウド基盤Eucalyptusのクラウドリソース管理機能を提供する日本語フロントエンドです。
 
 
@@ -33,16 +33,15 @@ Cocuumaはオープンソースクラウド基盤Eucalyptusのクラウドリソ
 
 動作環境
 ------
-OS:RedHat系Linux  
-apache2.2  
+OS: RedHat/CentOS  
+Eucalyptus: 3.0/3.1/3.3  
+Apache Http Server 2.2  
 Django 1.3.1  
 mod_wsgi 3.3  
-euca2ools, eucalyptus-admin-tools  
-
+euca2ools  
+eucalyptus-admin-tools  
 
 お問い合わせ先
 ------
 email: cocuuma@googlegroups.com
-
-
 

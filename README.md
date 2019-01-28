@@ -61,7 +61,4 @@ Licensed under the [MIT license][MIT]
 [Apache]: http://www.apache.org/licenses/LICENSE-2.0  
 [MIT]: http://www.opensource.org/licenses/mit-license.php  
 
-お問い合わせ先
-------
-email: cocuuma@googlegroups.com
 
